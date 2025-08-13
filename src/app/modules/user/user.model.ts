@@ -7,7 +7,7 @@ const userSchema = new Schema<IUser>({
     password: {type:String, required:true},
     picture:{type:String},
     isBlocked:{type:Boolean},
-    role:{type:String, enum: Object.values(IRole), required:true}
+    role:{type:String, enum: Object.values(IRole), required:true, default: IRole.RIDER}
 })
 
 export const User = model<IUser>("User", userSchema)

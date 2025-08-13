@@ -13,7 +13,7 @@ const startServer = () =>{
     try {
         mongoose.connect(envVars.DATABASE_URL)
         console.log("The mongodb is connected")
-       server = app.listen(5000, ()=>{
+       server = app.listen(envVars.PORT, ()=>{
             console.log(`The server is running on the port of 5000`)
         })
 
