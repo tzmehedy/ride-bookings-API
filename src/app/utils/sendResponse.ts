@@ -1,4 +1,3 @@
-import  httpStatusCode from 'http-status-codes';
 import { Response } from "express";
 
 interface IMeta{
@@ -6,6 +5,7 @@ interface IMeta{
 }
 
 interface ISendResponse<T>{
+    statusCode: number,
     success: boolean,
     message: string,
     data: T,
@@ -13,9 +13,9 @@ interface ISendResponse<T>{
 }
 
 export const sendResponse = async <T>(res: Response, data: ISendResponse<T>) => {
-  res.status(httpStatusCode.CREATED).json({
-    success: true,
-    message: "The user is created successfully",
+  res.status(data.statusCode).json({
+    success: data.success,
+    message: data.message,
     data: data,
   });
 };

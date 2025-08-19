@@ -1,3 +1,4 @@
+import  httpStatusCode  from 'http-status-codes';
 import { NextFunction, Request, Response } from "express";
 import { userServices } from "./user.services";
 import { catchAsync } from "../../utils/catchAsync";
@@ -10,6 +11,7 @@ const createUser = catchAsync(
     const user = await userServices.createUser(payload);
 
     sendResponse(res, {
+        statusCode: httpStatusCode.CREATED,
         success: true,
         message: "User created successfully",
         data: user
