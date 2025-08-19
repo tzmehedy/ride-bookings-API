@@ -8,6 +8,8 @@ const userSchema = new Schema<IUser>({
     picture:{type:String},
     isBlocked:{type:Boolean},
     role:{type:String, enum: Object.values(IRole), required:true, default: IRole.RIDER}
+},{
+    timestamps:true
 })
 
 export const User = model<IUser>("User", userSchema)
