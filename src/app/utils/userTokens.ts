@@ -1,33 +1,30 @@
 import { envVars } from "../config/env";
 import { IUser } from "../modules/user/user.interface";
-import jwt from "jsonwebtoken"
+import { generateToken } from "./jwt";
 
-export const createUserTokens = async(user:Partial<IUser>)=>{
-    const jwtPayload = {
-        userId: user._id,
-        email: user.email,
-        role: user.role,
-    }
+export const createUserTokens = async (user: Partial<IUser>) => {
+  const jwtPayload = {
+    userId: user._id,
+    email: user.email,
+    role: user.role,
+  };
 
-     const accessToken = await jwt.sign(
-       jwtPayload,
-       envVars.JWT_ACCESS_SECRET_KEY,
-       {
-         expiresIn: "1d",
-       }
-     );
+ 
 
-     const refreshToken = await jwt.sign(
-       jwtPayload,
-       envVars.JWT_REFRESH_SECRET_KEY,
-       {
-         expiresIn: "30d",
-       }
-     );
+  const accessToken = await generateToken(
+    jwtPayload,
+    envVars.JWT_ACCESS_SECRET_KEY,
+    envVars.JWT_ACCESS_EXPIRES_IN
+  );
 
-     return {
-        accessToken,
-        refreshToken
-     }
+  const refreshToken = await generateToken(
+    jwtPayload,
+    envVars.JWT_REFRESH_SECRET_KEY,
+    envVars.JWT_REFRESH_EXPIRES_IN
+  );
 
-}
+  return {
+    accessToken,
+    refreshToken,
+  };
+};

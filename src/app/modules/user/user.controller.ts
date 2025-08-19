@@ -8,6 +8,7 @@ const createUser = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
+    
     const user = await userServices.createUser(payload);
 
     sendResponse(res, {
