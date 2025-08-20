@@ -15,6 +15,13 @@ export const createZodSchema = z.object({
     .regex(/^(?=.*[!@#$%^&*,.?":{}|<>_\-+=~`[\]\\;/'])/, {
       message: "The password must have a special character",
     }),
+    phone: z
+    .string()
+    .regex(/^(?:\+?88)?01[3-9]\d{8}$/, {
+      message:
+        "Phone number must be Bangladeshi format..., for example:- +8801700000000",
+    })
+    .optional(),
   picture: z.string().optional(),
   isBlocked: z.boolean().optional(),
 });
