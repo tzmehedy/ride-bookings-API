@@ -6,6 +6,9 @@ const vehicleInfoSchema = new Schema<vehicleInfo>({
     brand_name: {type:String, required:true},
     model: {type:String, required:true},
     vehicle_number: {type:String, required:true}
+},{
+    versionKey:false,
+    id: false
 })
 
 const driverSchema = new Schema<IDriver>({
@@ -22,6 +25,8 @@ const driverSchema = new Schema<IDriver>({
     default: IIsActive.InActive,
   },
   vehicle_info: {type: vehicleInfoSchema, required:true},
+},{
+    timestamps:true,
 });
 
 export const Driver = model<IDriver>("Driver", driverSchema)
