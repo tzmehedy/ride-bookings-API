@@ -11,7 +11,12 @@ interface IEnvConfig {
   JWT_ACCESS_EXPIRES_IN: string;
 
   JWT_REFRESH_SECRET_KEY: string;
-  JWT_REFRESH_EXPIRES_IN:string
+  JWT_REFRESH_EXPIRES_IN: string;
+
+  ADMIN_Email: string;
+  ADMIN_PASS: string;
+  ADMIN_PHONE: string;
+  ADMIN_NAME: string;
 }
 
 const loadEnvVars = ():IEnvConfig =>{
@@ -24,6 +29,10 @@ const loadEnvVars = ():IEnvConfig =>{
       "JWT_ACCESS_EXPIRES_IN",
       "JWT_REFRESH_SECRET_KEY",
       "JWT_REFRESH_EXPIRES_IN",
+      "ADMIN_Email",
+      "ADMIN_PASS",
+      "ADMIN_PHONE",
+      "ADMIN_NAME",
     ];
 
     requiredEnvVar.forEach(key=>{
@@ -43,6 +52,10 @@ const loadEnvVars = ():IEnvConfig =>{
       JWT_ACCESS_EXPIRES_IN: process.env.JWT_ACCESS_EXPIRES_IN as string,
       JWT_REFRESH_SECRET_KEY: process.env.JWT_REFRESH_SECRET_KEY as string,
       JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN as string,
+      ADMIN_Email: process.env.ADMIN_Email as string,
+      ADMIN_PASS: process.env.ADMIN_PASS as string,
+      ADMIN_PHONE: process.env.ADMIN_PHONE as string,
+      ADMIN_NAME: process.env.ADMIN_NAME as string,
     };
 }
 
