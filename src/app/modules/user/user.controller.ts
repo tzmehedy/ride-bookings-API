@@ -20,18 +20,20 @@ const createUser = catchAsync(
   }
 );
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getAllUser = async(req:Request,res:Response,next:NextFunction) =>{
-  const users = await userServices.getAllUser()
 
-  sendResponse(res, {
-    statusCode: httpStatusCode.OK,
-    success:true,
-    message: "All user retrieve successfully..!!",
-    data: users
-  })
+const getAllUser = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const users = await userServices.getAllUser();
 
-}
+    sendResponse(res, {
+      statusCode: httpStatusCode.OK,
+      success: true,
+      message: "All user retrieve successfully..!!",
+      data: users,
+    });
+  }
+);
 
 export const userControllers = {
   createUser,
