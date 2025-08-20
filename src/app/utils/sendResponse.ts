@@ -16,6 +16,6 @@ export const sendResponse = async <T>(res: Response, data: ISendResponse<T>) => 
   res.status(data.statusCode).json({
     success: data.success,
     message: data.message,
-    data: data,
+    data: data.data,
   });
 };

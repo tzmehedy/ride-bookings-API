@@ -20,6 +20,20 @@ const createUser = catchAsync(
   }
 );
 
-export const userControllers = {
-    createUser
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getAllUser = async(req:Request,res:Response,next:NextFunction) =>{
+  const users = await userServices.getAllUser()
+
+  sendResponse(res, {
+    statusCode: httpStatusCode.OK,
+    success:true,
+    message: "All user retrieve successfully..!!",
+    data: users
+  })
+
 }
+
+export const userControllers = {
+  createUser,
+  getAllUser,
+};

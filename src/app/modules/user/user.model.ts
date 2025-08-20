@@ -6,7 +6,7 @@ const userSchema = new Schema<IUser>({
     email: {type:String, required:true, unique:true},
     password: {type:String, required:true},
     picture:{type:String},
-    isBlocked:{type:Boolean},
+    isBlocked:{type:Boolean, default:false},
     role:{type:String, enum: Object.values(IRole), required:true, default: IRole.RIDER}
 },{
     timestamps:true
