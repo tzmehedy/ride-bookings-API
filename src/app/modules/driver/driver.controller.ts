@@ -17,6 +17,35 @@ const createDriver = catchAsync(async(req:Request, res:Response, next:NextFuncti
     })
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getAllDrivers = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
+    const allDrivers = await DriverServices.getAllDrivers()
+
+    sendResponse(res, {
+        statusCode: httpStatusCode.OK,
+        success:true,
+        message: "All driver retrieve successfully.",
+        data: allDrivers
+    })
+})
+
+const driverApproval = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.id
+    const updatedDriverInfo = await DriverServices.driverApproval(userId)
+    
+    sendResponse(res, {
+        statusCode: httpStatusCode.OK,
+        success: true,
+        message: "The Driver is approve for driving.",
+        data: updatedDriverInfo
+    })
+  }
+);
+
 export const DriverControllers = {
-    createDriver
-}
+  createDriver,
+  driverApproval,
+  getAllDrivers,
+};

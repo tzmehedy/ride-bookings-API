@@ -1,6 +1,6 @@
 import  httpStatusCode  from 'http-status-codes';
 import { Driver } from "./driver.model";
-import { IDriver } from "./driver.interface";
+import { IApprovalStatus, IDriver } from "./driver.interface";
 import { User } from "../user/user.model";
 import AppError from "../../errorhelpers/appError";
 import { IRole } from '../user/user.interface';
@@ -20,6 +20,25 @@ const createDriver = async (payload: Partial<IDriver>) => {
     return driverInfo
 }
 
-export const DriverServices = {
-    createDriver
+const getAllDrivers = async() =>{
+    const allDrivers = await Driver.find().populate("userId");
+    return allDrivers
 }
+
+const driverApproval = async(userId: string) =>{
+
+    const updatedDoc: Partial<IDriver>= {
+      approval_status: IApprovalStatus.Accept
+    }
+
+    const updatedDriverInfo = await Driver.findByIdAndUpdate(userId, updatedDoc, {new:true})
+
+    return updatedDriverInfo
+}
+
+
+export const DriverServices = {
+  createDriver,
+  driverApproval,
+  getAllDrivers,
+};
