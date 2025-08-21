@@ -28,7 +28,23 @@ const getAllUser = async() =>{
 
 } 
 
+const blockedUser = async(id:string)=>{
+
+    const updatedUsersDoc = {
+      isBlocked : true
+    };
+
+    const updatedUserInfo = await User.findByIdAndUpdate(id, updatedUsersDoc, {new:true})
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: pass, ...rest } = updatedUserInfo?.toObject() as IUser;
+
+    return rest;
+
+}
+
 export const userServices = {
   createUser,
   getAllUser,
+  blockedUser,
 };

@@ -35,7 +35,23 @@ const getAllUser = catchAsync(
   }
 );
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const blockedUser = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
+  const id = req.params.id 
+
+  const blockedUserInfo = await userServices.blockedUser(id)
+
+  sendResponse(res, {
+    statusCode: httpStatusCode.OK,
+    success:true,
+    message: "The user is successfully blocked",
+    data: blockedUserInfo
+  })
+
+})
+
 export const userControllers = {
   createUser,
   getAllUser,
+  blockedUser,
 };

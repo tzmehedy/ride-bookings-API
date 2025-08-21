@@ -11,4 +11,6 @@ router.post("/register", validationRequest(createZodSchema), userControllers.cre
 
 router.get("/all-users", checkAuth(IRole.ADMIN), userControllers.getAllUser)
 
+router.patch("/block/:id", checkAuth(IRole.ADMIN), userControllers.blockedUser)
+
 export const userRoutes = router
