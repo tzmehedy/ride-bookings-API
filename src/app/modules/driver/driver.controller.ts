@@ -3,11 +3,34 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { DriverServices } from "./driver.services";
 import { sendResponse } from "../../utils/sendResponse";
+import { verifyToken } from '../../utils/jwt';
+import { JwtPayload } from 'jsonwebtoken';
+import AppError from '../../errorhelpers/appError';
+import { IDriver } from './driver.interface';
+import { Types } from 'mongoose';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const createDriver = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
 
-    const driverInfo = await DriverServices.createDriver(req.body)
+  const userId = req.params.id
+  
+  const {vehicle_info} = req.body 
+
+  const accessToken = req.cookies.accessToken;
+
+  const verifiedToken = (await verifyToken(accessToken)) as JwtPayload;
+
+  if (verifiedToken.userId !== userId) {
+    throw new AppError(403, "Forbidden Access.");
+  }
+
+  const driverInfoPayload: Partial<IDriver>= {
+    userId: new Types.ObjectId(userId),
+    vehicle_info,
+  };
+
+
+    const driverInfo = await DriverServices.createDriver(driverInfoPayload);
 
     sendResponse(res, {
         statusCode: httpStatusCode.CREATED,
@@ -33,6 +56,8 @@ const driverApproval = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id
+    
+
     const updatedDriverInfo = await DriverServices.driverApproval(userId)
     
     sendResponse(res, {

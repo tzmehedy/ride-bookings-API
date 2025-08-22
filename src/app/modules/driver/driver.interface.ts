@@ -1,5 +1,11 @@
 import { Types } from "mongoose";
 
+// export enum DriverStatus {
+//   Available = "Available",
+//   Picked_Up = "Picked_Up",
+//   In_Transit = "In_Transit",
+//   Completed = "Completed",
+// }
 export interface vehicleInfo{
     brand_name: string,
     model: string,
@@ -21,8 +27,9 @@ export enum IApprovalStatus {
 export interface IDriver {
   _id?: Types.ObjectId;
   userId: Types.ObjectId;
-  rideId?: Types.ObjectId[];
+  rideId: Types.ObjectId[];
   approval_status?: IApprovalStatus;
   online_status?: IIsActive;
   vehicle_info: vehicleInfo;
+  availability?: boolean;
 }
