@@ -23,7 +23,7 @@ const requestRide = async (payload: Partial<IRide>) => {
 
   if (isUserExist) {
     isUserExist.forEach((r) => {
-      if (r.ride_status !== RideStatus.Completed) {
+      if (r.ride_status !== RideStatus.Completed && r.ride_status !== RideStatus.Canceled) {
         throw new AppError(
           httpStatusCode.BAD_REQUEST,
           "You already in a ride."
@@ -94,8 +94,16 @@ const rideMe = async (id: string) => {
   return allRides;
 };
 
+
+const cancelRide = async(id: string) =>{
+ const rideInfo = await Ride.findByIdAndUpdate(id, {ride_status:RideStatus.Canceled}, {new:true})  
+ await Driver.findByIdAndDelete(rideInfo?.driverId, { availability: true });
+ return rideInfo
+}
+
 export const rideServices = {
   requestRide,
   updateRideStatus,
   rideMe,
+  cancelRide,
 };

@@ -9,7 +9,8 @@ export const setCookies = async (res: Response, tokenInfo: ITokenInfo) => {
     if(tokenInfo.accessToken){
         res.cookie("accessToken", tokenInfo.accessToken, {
             httpOnly:true,
-            secure:true
+            secure:true,
+            sameSite: "none"
         })
     }
 
@@ -17,6 +18,7 @@ export const setCookies = async (res: Response, tokenInfo: ITokenInfo) => {
         res.cookie("refreshToken", tokenInfo.refreshToken, {
           httpOnly: true,
           secure: true,
+          sameSite: "none"
         });
         
     }

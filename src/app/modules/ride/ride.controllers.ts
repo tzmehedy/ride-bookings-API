@@ -55,8 +55,23 @@ const rideMe = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
     })
 })
 
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const cancelRide = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
+    const rideId = req.params.id
+    const updatedRideInfo = await rideServices.cancelRide(rideId)
+    sendResponse(res, {
+        statusCode: httpStatusCode.OK,
+        success:true,
+        message: "The ride successfully canceled.",
+        data: updatedRideInfo
+
+    })
+})
+
 export const rideControllers = {
   requestRide,
   updateRideStatus,
   rideMe,
+  cancelRide,
 };
