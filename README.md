@@ -106,7 +106,7 @@ POST /driver/request - Register driver
 PATCH /rides/approve/:id – Accept a ride.
 
 PATCH /rides/:id/status – Update ride status.
-
+ 
 🛠 Admin
 
 GET /users – View all users.
