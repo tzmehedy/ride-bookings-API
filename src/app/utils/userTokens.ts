@@ -9,8 +9,6 @@ export const createUserTokens = async (user: Partial<IUser>) => {
     role: user.role,
   };
 
- 
-
   const accessToken = await generateToken(
     jwtPayload,
     envVars.JWT_ACCESS_SECRET_KEY,

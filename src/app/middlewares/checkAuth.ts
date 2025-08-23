@@ -21,6 +21,8 @@ export const checkAuth = (...AuthRole: string[]) => async(req:Request, res:Respo
             throw new AppError(httpStatusCode.BAD_REQUEST, "You are not login. Please login first")
         }
         
+        req.user = verifiedTokenInfo
+
         const isUserExist = await User.findOne({email:verifiedTokenInfo.email})
 
         if(!isUserExist){
