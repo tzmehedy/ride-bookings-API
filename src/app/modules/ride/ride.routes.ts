@@ -7,5 +7,6 @@ const router = Router()
 
 router.post("/request", checkAuth(IRole.RIDER), rideControllers.requestRide)
 router.patch("/:id", checkAuth(IRole.DRIVER), rideControllers.updateRideStatus)
+router.get("/me/:id", checkAuth(IRole.RIDER), rideControllers.rideMe)
 
 export const rideRoutes = router
