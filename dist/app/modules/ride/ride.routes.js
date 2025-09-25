@@ -9,4 +9,5 @@ const router = (0, express_1.Router)();
 router.post("/request", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.RIDER), ride_controllers_1.rideControllers.requestRide);
 router.patch("/:id", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.DRIVER), ride_controllers_1.rideControllers.updateRideStatus);
 router.get("/me/:id", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.RIDER), ride_controllers_1.rideControllers.rideMe);
+router.patch("/cancel/:id", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.DRIVER, user_interface_1.IRole.RIDER), ride_controllers_1.rideControllers.cancelRide);
 exports.rideRoutes = router;

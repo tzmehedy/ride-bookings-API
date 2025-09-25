@@ -31,7 +31,7 @@ const requestRide = (payload) => __awaiter(void 0, void 0, void 0, function* () 
     const isUserExist = yield ride_model_1.Ride.find({ userId: payload.userId });
     if (isUserExist) {
         isUserExist.forEach((r) => {
-            if (r.ride_status !== ride_interface_1.RideStatus.Completed) {
+            if (r.ride_status !== ride_interface_1.RideStatus.Completed && r.ride_status !== ride_interface_1.RideStatus.Canceled) {
                 throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "You already in a ride.");
             }
         });
@@ -78,8 +78,14 @@ const rideMe = (id) => __awaiter(void 0, void 0, void 0, function* () {
     });
     return allRides;
 });
+const cancelRide = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const rideInfo = yield ride_model_1.Ride.findByIdAndUpdate(id, { ride_status: ride_interface_1.RideStatus.Canceled }, { new: true });
+    yield driver_model_1.Driver.findByIdAndDelete(rideInfo === null || rideInfo === void 0 ? void 0 : rideInfo.driverId, { availability: true });
+    return rideInfo;
+});
 exports.rideServices = {
     requestRide,
     updateRideStatus,
     rideMe,
+    cancelRide,
 };

@@ -58,8 +58,20 @@ const rideMe = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0
         data: allRideMe
     });
 }));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const cancelRide = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const rideId = req.params.id;
+    const updatedRideInfo = yield ride_services_1.rideServices.cancelRide(rideId);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "The ride successfully canceled.",
+        data: updatedRideInfo
+    });
+}));
 exports.rideControllers = {
     requestRide,
     updateRideStatus,
     rideMe,
+    cancelRide,
 };

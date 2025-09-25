@@ -8,4 +8,5 @@ var RideStatus;
     RideStatus["Picked_Up"] = "Picked_Up";
     RideStatus["In_Transit"] = "In_Transit";
     RideStatus["Completed"] = "Completed";
+    RideStatus["Canceled"] = "Canceled";
 })(RideStatus || (exports.RideStatus = RideStatus = {}));

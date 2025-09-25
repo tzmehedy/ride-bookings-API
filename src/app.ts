@@ -14,6 +14,7 @@ app.use("/api/v1", router)
 
 app.get("/", (req:Request, res:Response)=>{
     res.status(200).send({
+        success:true,
         statusCode:true,
         message:"The ride bookings api is coming soon...."
     })

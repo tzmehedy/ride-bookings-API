@@ -2,8 +2,8 @@ import z from "zod";
 
 export const createZodSchema = z.object({
   name: z
-    .string({ error: "Name must be string" })
-    .min(5, { message: "The name must " })
+    .string({ message: "Name must be string" })
+    .min(5, { message: "The name must be 5 character" })
     .max(30, { message: "The name length must be less than 30" }),
   email: z.string().email({ error: "Please provide a valid email" }),
   password: z
