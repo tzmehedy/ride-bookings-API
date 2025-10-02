@@ -20,6 +20,7 @@ const seedAdmin_1 = require("./app/utils/seedAdmin");
 let server;
 const startServer = () => {
     try {
+        console.log(env_1.envVars.DATABASE_URL);
         mongoose_1.default.connect(env_1.envVars.DATABASE_URL);
         console.log("The mongodb is connected");
         server = app_1.app.listen(env_1.envVars.PORT, () => {

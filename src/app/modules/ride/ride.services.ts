@@ -4,7 +4,7 @@ import { Driver } from "../driver/driver.model";
 import { IRide, RideStatus } from "./ride.interface";
 import { Ride } from "./ride.model";
 
-const requestRide = async (payload: Partial<IRide>) => {
+const requestRide = async (payload: Partial<IRide>, userId: string) => {
   const allAvailableDriver = await Driver.find({
     approval_status: "Accept",
     online_status: "Active",
@@ -19,7 +19,7 @@ const requestRide = async (payload: Partial<IRide>) => {
     );
   }
 
-  const isUserExist = await Ride.find({ userId: payload.userId });
+  const isUserExist = await Ride.find({ user: userId});
 
   if (isUserExist) {
     isUserExist.forEach((r) => {
@@ -34,10 +34,16 @@ const requestRide = async (payload: Partial<IRide>) => {
 
   const updatedRideInfo = {
     ...payload,
-    driverId: availableDriver._id,
+    user: userId,
+    driver: availableDriver._id,
     ride_status: RideStatus.Accepted,
   };
+
+  console.log(updatedRideInfo)
+  
   const rideRequestInfo = await Ride.create(updatedRideInfo);
+
+  console.log(rideRequestInfo)
 
   await Driver.findByIdAndUpdate(availableDriver._id, {
     rideId: [...availableDriver.rideId, rideRequestInfo._id],
@@ -72,7 +78,7 @@ const updateRideStatus = async (id: string, status: string) => {
       },
       { new: true }
     );
-    await Driver.findByIdAndUpdate(updatedInfo?.driverId, {
+    await Driver.findByIdAndUpdate(updatedInfo?.driver, {
       availability: true,
     });
     return updatedInfo;
@@ -97,7 +103,7 @@ const rideMe = async (id: string) => {
 
 const cancelRide = async(id: string) =>{
  const rideInfo = await Ride.findByIdAndUpdate(id, {ride_status:RideStatus.Canceled}, {new:true})  
- await Driver.findByIdAndDelete(rideInfo?.driverId, { availability: true });
+ await Driver.findByIdAndDelete(rideInfo?.driver, { availability: true });
  return rideInfo
 }
 

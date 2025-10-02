@@ -7,8 +7,8 @@ exports.createZodSchema = void 0;
 const zod_1 = __importDefault(require("zod"));
 exports.createZodSchema = zod_1.default.object({
     name: zod_1.default
-        .string({ error: "Name must be string" })
-        .min(5, { message: "The name must " })
+        .string({ message: "Name must be string" })
+        .min(5, { message: "The name must be 5 character" })
         .max(30, { message: "The name length must be less than 30" }),
     email: zod_1.default.string().email({ error: "Please provide a valid email" }),
     password: zod_1.default

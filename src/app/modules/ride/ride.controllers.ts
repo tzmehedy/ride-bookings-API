@@ -8,11 +8,10 @@ import AppError from '../../errorhelpers/appError';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const requestRide = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
+    
     const userId = req.user.userId 
-    if(userId !== req.body.userId){
-        throw new AppError(httpStatusCode.FORBIDDEN, "Forbidden Access.")
-    }
-    const rideRequestInfo = await rideServices.requestRide(req.body)
+    
+    const rideRequestInfo = await rideServices.requestRide(req.body, userId)
     sendResponse(res, {
         statusCode: httpStatusCode.OK,
         success: true,

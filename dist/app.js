@@ -16,6 +16,7 @@ exports.app.use((0, cookie_parser_1.default)());
 exports.app.use("/api/v1", router_1.router);
 exports.app.get("/", (req, res) => {
     res.status(200).send({
+        success: true,
         statusCode: true,
         message: "The ride bookings api is coming soon...."
     });

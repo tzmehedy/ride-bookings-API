@@ -11,9 +11,10 @@ export enum RideStatus {
 
 
 export interface IRide {
-  _id?: Types.ObjectId;
-  userId?: Types.ObjectId;
-  driverId?: Types.ObjectId;
+  _id: Types.ObjectId;
+  user: Types.ObjectId;
+  driver: Types.ObjectId;
+  payment?: Types.ObjectId,
   pickup_address: string;
   destination_address: string;
   distance: number;
