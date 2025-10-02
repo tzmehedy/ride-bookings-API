@@ -12,6 +12,8 @@ const paymentSchema = new Schema<IPayment>({
     enum: Object.values(PaymentStatus),
     default: PaymentStatus.UNPAID,
   },
+}, {
+    timestamps: true
 })
 
 export const Payment = model<IPayment>("Payment", paymentSchema)

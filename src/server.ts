@@ -12,7 +12,6 @@ let server:Server
 
 const startServer = () =>{
     try {
-        console.log(envVars.DATABASE_URL)
         mongoose.connect(envVars.DATABASE_URL)
         console.log("The mongodb is connected")
        server = app.listen(envVars.PORT, ()=>{

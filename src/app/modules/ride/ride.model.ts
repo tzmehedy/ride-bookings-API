@@ -14,6 +14,8 @@ const rideSchema = new Schema<IRide>({
     enum: Object.values(RideStatus),
     default: RideStatus.Requested,
   },
+}, {
+  timestamps: true
 });
 
 
