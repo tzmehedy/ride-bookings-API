@@ -17,6 +17,19 @@ interface IEnvConfig {
   ADMIN_PASS: string;
   ADMIN_PHONE: string;
   ADMIN_NAME: string;
+
+  SSL: {
+    SSL_COMMERZ_ID: string;
+    SSL_COMMERZ_PASS: string;
+    SSL_COMMERZ_PAYMENT_API: string;
+    SSL_COMMERZ_VALIDATION_API: string;
+    SSL_COMMERZ_FRONTEND_SUCCESS_URL: string;
+    SSL_COMMERZ_FRONTEND_CANCEL_URL: string;
+    SSL_COMMERZ_FRONTEND_FAILED_URL: string;
+    SSL_COMMERZ_BACKEND_SUCCESS_URL: string;
+    SSL_COMMERZ_BACKEND_CANCEL_URL: string;
+    SSL_COMMERZ_BACKEND_FAILED_URL: string;
+  };
 }
 
 const loadEnvVars = ():IEnvConfig =>{
@@ -33,6 +46,16 @@ const loadEnvVars = ():IEnvConfig =>{
       "ADMIN_PASS",
       "ADMIN_PHONE",
       "ADMIN_NAME",
+      "SSL_COMMERZ_ID",
+      "SSL_COMMERZ_PASS",
+      "SSL_COMMERZ_PAYMENT_API",
+      "SSL_COMMERZ_VALIDATION_API",
+      "SSL_COMMERZ_FRONTEND_SUCCESS_URL",
+      "SSL_COMMERZ_FRONTEND_CANCEL_URL",
+      "SSL_COMMERZ_FRONTEND_FAILED_URL",
+      "SSL_COMMERZ_BACKEND_SUCCESS_URL",
+      "SSL_COMMERZ_BACKEND_CANCEL_URL",
+      "SSL_COMMERZ_BACKEND_FAILED_URL"
     ];
 
     requiredEnvVar.forEach(key=>{
@@ -56,6 +79,21 @@ const loadEnvVars = ():IEnvConfig =>{
       ADMIN_PASS: process.env.ADMIN_PASS as string,
       ADMIN_PHONE: process.env.ADMIN_PHONE as string,
       ADMIN_NAME: process.env.ADMIN_NAME as string,
+
+      SSL: {
+        SSL_COMMERZ_ID: process.env.SSL_COMMERZ_ID as string,
+        SSL_COMMERZ_PASS: process.env.SSL_COMMERZ_PASS as string,
+        SSL_COMMERZ_PAYMENT_API: process.env.SSL_COMMERZ_PAYMENT_API as string,
+        SSL_COMMERZ_VALIDATION_API: process.env
+          .SSL_COMMERZ_VALIDATION_API as string,
+
+        SSL_COMMERZ_FRONTEND_SUCCESS_URL: process.env.SSL_COMMERZ_FRONTEND_SUCCESS_URL as string,
+        SSL_COMMERZ_FRONTEND_CANCEL_URL: process.env.SSL_COMMERZ_FRONTEND_CANCEL_URL as string,
+        SSL_COMMERZ_FRONTEND_FAILED_URL: process.env.SSL_COMMERZ_FRONTEND_FAILED_URL as string,
+        SSL_COMMERZ_BACKEND_SUCCESS_URL: process.env.SSL_COMMERZ_BACKEND_SUCCESS_URL as string,
+        SSL_COMMERZ_BACKEND_CANCEL_URL: process.env.SSL_COMMERZ_BACKEND_CANCEL_URL as string,
+        SSL_COMMERZ_BACKEND_FAILED_URL: process.env.SSL_COMMERZ_BACKEND_FAILED_URL as string
+      },
     };
 }
 

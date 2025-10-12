@@ -1,12 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatusCode from "http-status-codes";
 import AppError from "../../errorhelpers/appError";
 import { Driver } from "../driver/driver.model";
 import { IRide, RideStatus } from "./ride.interface";
 import { Ride } from "./ride.model";
 import { Payment } from "../payment/payment.model";
+import { sslCommerzServices } from "../sslcommerz/sslCommerz.services";
+import { ISSLCommerz } from "../sslcommerz/sslCommerz.interface";
 
 const generateTransitionId = () => {
-  return `transId_${new Date()}_${Math.floor(Math.random() * 1000)}`;
+  return `transId_${Date.now()}_${Math.floor(Math.random()*10000)}`;
 };
 
 const requestRide = async (payload: Partial<IRide>, userId: string) => {
@@ -54,10 +57,12 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
       ride_status: RideStatus.Accepted,
     }], {session});
 
+    
+
     await Driver.findByIdAndUpdate(availableDriver._id, {
       rideId: [...availableDriver.rideId, rideRequestInfo[0]._id],
       availability: false,
-    });
+    }, {session});
 
     const paymentInfo = await Payment.create([{
       ride: rideRequestInfo[0]._id,
@@ -70,22 +75,38 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
       {
         payment: paymentInfo[0]._id,
       },
-      { new: true, runValidators: true}
+      { new: true, runValidators: true, session}
     )
       .populate("user", "name email phone")
       .populate("driver", "approval_status online_status vehicle_info")
       .populate("payment");
 
+
+    const sslCommerzPayload: ISSLCommerz = {
+      amount: (updatedRideInfo?.payment as any).amount,
+      transitionID: (updatedRideInfo?.payment as any).transitionId,
+      name: (updatedRideInfo?.user as any).name,
+      email: (updatedRideInfo?.user as any).email,
+      phone: (updatedRideInfo?.user as any).phone,
+      
+    };
+
+    const sslPaymentInfo = await sslCommerzServices.initPayment(
+      sslCommerzPayload
+    ); 
+
     await session.commitTransaction()
     session.endSession()
 
-    return updatedRideInfo;
+    return {
+      paymentUrl: sslPaymentInfo.GatewayPageURL,
+      rideInfo: updatedRideInfo,
+    };
     
   } catch (error) {
     await session.abortTransaction()
     session.endSession()
-    throw error
-    
+    throw error 
   }
 };
 
