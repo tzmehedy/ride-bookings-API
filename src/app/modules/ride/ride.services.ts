@@ -111,35 +111,13 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
 };
 
 const updateRideStatus = async (id: string, status: string) => {
-  if (status === RideStatus.Picked_Up) {
+
     const updatedInfo = await Ride.findByIdAndUpdate(
       id,
-      { ride_status: RideStatus.Picked_Up },
+      { ride_status: status },
       { new: true }
     );
     return updatedInfo;
-  } else if (status === RideStatus.In_Transit) {
-    const updatedInfo = await Ride.findByIdAndUpdate(
-      id,
-      {
-        ride_status: RideStatus.In_Transit,
-      },
-      { new: true }
-    );
-    return updatedInfo;
-  } else if (status === RideStatus.Completed) {
-    const updatedInfo = await Ride.findByIdAndUpdate(
-      id,
-      {
-        ride_status: RideStatus.Completed,
-      },
-      { new: true }
-    );
-    await Driver.findByIdAndUpdate(updatedInfo?.driver, {
-      availability: true,
-    });
-    return updatedInfo;
-  }
 };
 
 const rideMe = async (id: string) => {
