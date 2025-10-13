@@ -4,7 +4,6 @@ import AppError from "../../errorhelpers/appError";
 import { ISSLCommerz } from "./sslCommerz.interface";
 import axios from "axios"
 
-
 const initPayment = async(payload: ISSLCommerz) =>{
 
     try {
@@ -14,9 +13,9 @@ const initPayment = async(payload: ISSLCommerz) =>{
           total_amount: payload.amount,
           currency: "BDT",
           tran_id: payload.transitionID,
-          success_url: envVars.SSL.SSL_COMMERZ_BACKEND_SUCCESS_URL,
-          fail_url: envVars.SSL.SSL_COMMERZ_BACKEND_FAILED_URL,
-          cancel_url: envVars.SSL.SSL_COMMERZ_BACKEND_CANCEL_URL,
+          success_url: `${envVars.SSL.SSL_COMMERZ_BACKEND_SUCCESS_URL}?transitionId=${payload.transitionID}&amount=${payload.amount}&status=success`,
+          fail_url: `${envVars.SSL.SSL_COMMERZ_BACKEND_FAILED_URL}?transitionId=${payload.transitionID}&amount=${payload.amount}&status=fail`,
+          cancel_url: `${envVars.SSL.SSL_COMMERZ_BACKEND_CANCEL_URL}?transitionId=${payload.transitionID}&amount=${payload.amount}&status=cancel`,
           cus_name: payload.name,
           cus_email: payload.email,
           cus_add1: "N/A",

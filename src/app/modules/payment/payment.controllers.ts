@@ -1,14 +1,30 @@
+import  httpStatusCode  from 'http-status-codes';
 
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { paymentServices } from "./payment.services";
 import { envVars } from "../../config/env";
+import { sendResponse } from "../../utils/sendResponse";
+
+
+const initPayment = catchAsync(async (req: Request, res: Response) => {
+  const rideId = req.params.rideId
+
+  const paymentURL = await paymentServices.initPayment(rideId)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatusCode.OK,
+    message: "New Payment Url get successfully.",
+    data:{
+        paymentURL
+    }
+  })
+});
 
 
 
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const successPayment = catchAsync(async(req: Request, res: Response, next: NextFunction)=>{
+const successPayment = catchAsync(async(req: Request, res: Response)=>{
     const query = req.query
     const result = await paymentServices.successPayment(query as Record<string, string>)
 
@@ -17,6 +33,38 @@ const successPayment = catchAsync(async(req: Request, res: Response, next: NextF
     }
 })
 
+
+const failPayment = catchAsync(
+  async (req: Request, res: Response) => {
+    const query = req.query;
+    const result = await paymentServices.failPayment(
+      query as Record<string, string>
+    );
+
+    if (!result.success) {
+      res.redirect(envVars.SSL.SSL_COMMERZ_FRONTEND_FAILED_URL);
+    }
+  }
+);
+
+
+const cancelPayment = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query;
+  const result = await paymentServices.cancelPayment(
+    query as Record<string, string>
+  );
+
+  if (!result.success) {
+    res.redirect(envVars.SSL.SSL_COMMERZ_FRONTEND_CANCEL_URL);
+  }
+});
+
+
+
+
 export const paymentControllers = {
-    successPayment
-}
+  successPayment,
+  failPayment,
+  cancelPayment,
+  initPayment,
+};
