@@ -48,16 +48,20 @@ const requestRide = (payload, userId) => __awaiter(void 0, void 0, void 0, funct
             });
         }
         const transitionId = generateTransitionId();
-        const rideRequestInfo = yield ride_model_1.Ride.create([Object.assign(Object.assign({}, payload), { user: userId, driver: availableDriver._id, ride_status: ride_interface_1.RideStatus.Accepted })], { session });
+        const rideRequestInfo = yield ride_model_1.Ride.create([
+            Object.assign(Object.assign({}, payload), { user: userId, driver: availableDriver._id, ride_status: ride_interface_1.RideStatus.Accepted }),
+        ], { session });
         yield driver_model_1.Driver.findByIdAndUpdate(availableDriver._id, {
             rideId: [...availableDriver.rideId, rideRequestInfo[0]._id],
             availability: false,
         }, { session });
-        const paymentInfo = yield payment_model_1.Payment.create([{
+        const paymentInfo = yield payment_model_1.Payment.create([
+            {
                 ride: rideRequestInfo[0]._id,
                 transitionId,
                 amount: rideRequestInfo[0].price,
-            }], { session });
+            },
+        ], { session });
         const updatedRideInfo = yield ride_model_1.Ride.findByIdAndUpdate(rideRequestInfo[0]._id, {
             payment: paymentInfo[0]._id,
         }, { new: true, runValidators: true, session })
@@ -107,6 +111,7 @@ const cancelRide = (id) => __awaiter(void 0, void 0, void 0, function* () {
     session.startTransaction();
     try {
         const isRideExist = yield ride_model_1.Ride.findById(id);
+        const paymentInfo = yield payment_model_1.Payment.findOne({ ride: id });
         if (!isRideExist) {
             throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "The ride does not exist.");
         }
@@ -120,12 +125,16 @@ const cancelRide = (id) => __awaiter(void 0, void 0, void 0, function* () {
         if (isRideExist.ride_status === ride_interface_1.RideStatus.Canceled) {
             throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "You already cancel the ride.");
         }
-        const updatedRideInfo = yield ride_model_1.Ride.findByIdAndUpdate(id, { ride_status: ride_interface_1.RideStatus.Canceled }, { new: true, session });
+        if ((paymentInfo === null || paymentInfo === void 0 ? void 0 : paymentInfo.paymentStatus) === payment_interface_1.PaymentStatus.PAID ||
+            (paymentInfo === null || paymentInfo === void 0 ? void 0 : paymentInfo.paymentStatus) === payment_interface_1.PaymentStatus.CANCEL) {
+            throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "You already pay for the ride, so you can not cancel this ride.To cancel this ride please contact with customer care service 16120");
+        }
+        const updatedRideInfo = yield ride_model_1.Ride.findByIdAndUpdate(id, { ride_status: ride_interface_1.RideStatus.Canceled }, { runValidators: true, new: true, session });
         yield driver_model_1.Driver.findByIdAndUpdate(updatedRideInfo === null || updatedRideInfo === void 0 ? void 0 : updatedRideInfo.driver, {
             availability: true,
         }, { session });
         yield payment_model_1.Payment.findOneAndUpdate({ ride: updatedRideInfo === null || updatedRideInfo === void 0 ? void 0 : updatedRideInfo._id }, {
-            paymentStatus: payment_interface_1.PaymentStatus.CANCEL
+            paymentStatus: payment_interface_1.PaymentStatus.CANCEL,
         }, { session });
         yield session.commitTransaction();
         session.endSession();

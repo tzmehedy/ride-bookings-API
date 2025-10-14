@@ -9,4 +9,6 @@ const router = (0, express_1.Router)();
 router.post("/register/:id", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.RIDER), driver_controller_1.DriverControllers.createDriver);
 router.patch("/approve/:id", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.ADMIN), driver_controller_1.DriverControllers.driverApproval);
 router.get("/", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.ADMIN), driver_controller_1.DriverControllers.getAllDrivers);
+router.post("/setAvailability/:driverId", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.DRIVER), driver_controller_1.DriverControllers.setAvailability);
+router.get("/viewMyEarning/:driverId", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.DRIVER), driver_controller_1.DriverControllers.viewMyEarning);
 exports.driverRoutes = router;

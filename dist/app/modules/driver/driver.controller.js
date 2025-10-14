@@ -63,8 +63,34 @@ const driverApproval = (0, catchAsync_1.catchAsync)(
         data: updatedDriverInfo
     });
 }));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const setAvailability = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const driverId = req.params.driverId;
+    const availability = req.query.availability;
+    const updatedDriverInfo = yield driver_services_1.DriverServices.setAvailability(driverId, availability);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.OK,
+        message: "Your availability updated successfully.",
+        data: updatedDriverInfo
+    });
+}));
+const viewMyEarning = (0, catchAsync_1.catchAsync)(
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+(req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const driverId = req.params.driverId;
+    const driverInfo = yield driver_services_1.DriverServices.viewMyEarning(driverId);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.OK,
+        message: "Your earning history get successfully.",
+        data: driverInfo,
+    });
+}));
 exports.DriverControllers = {
     createDriver,
     driverApproval,
     getAllDrivers,
+    setAvailability,
+    viewMyEarning,
 };
