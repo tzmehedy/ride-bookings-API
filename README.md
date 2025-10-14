@@ -1,118 +1,73 @@
-🚖 Ride Booking API
+# 🚗 Ride Booking API.
 
-A secure, scalable, and role-based backend API for a ride booking system (like Uber, Pathao) built with Express.js and Mongoose.
+A robust and type-safe backend API for ride booking application such as ride request, accept ride, after complete ride then make payment with SSL Commerz, Cancel ride functionality, view a driver earning using aggreation pipeline with mongoose, etc. functionality made in this project. To built the project, using- 
+**Express.js**, 
+**TypeScript**, 
+**MongoDB** 
+**Mongoose**.
 
-This system allows riders to request rides, drivers to accept and complete rides, and admins to manage the overall platform.
+---
 
-🎯 Project Overview
+## 🎯 Objective
 
-Key Features:
+Develop a full-featured Ride Booking System API that supports ride request, accept ride, after complete ride then make payment with SSL Commerz, Cancel ride functionality, view a driver earning using aggreation pipeline with mongoose, etc..
 
-🔐 Authentication – JWT-based login with hashed passwords (bcrypt).
+---
 
-🎭 Role-based Authorization – Admin, Rider, and Driver.
+## 🛠️ Tech Stack
 
-🧍 Rider Features – Request/cancel rides, view ride history.
+- **Backend Framework**: Express.js
+- **Language**: TypeScript
+- **Database**: MongoDB
+- **ODM**: Mongoose
+- **Runtime**: Node.js
 
-🚗 Driver Features – Accept/reject rides, update status, earnings history.
+---
 
-🛠 Admin Features – Manage users, approve/suspend drivers, monitor rides.
-
-📦 Clean Modular Architecture – Organized, production-ready folder structure.
-
-📌 Function
-
-✅ Riders
-
-Request a ride (pickup & destination).
-
-Cancel a ride (within allowed window).
-
-View ride history.
-
-✅ Drivers
-
-Accept/reject ride requests.
-
-Update ride status: requested → accepted → picked_up → in_transit → completed.
-
-
-✅ Admins
-
-View/manage all users, drivers, rides.
-
-Approve/suspend drivers.
-
-Block/unblock users.
-
-✅ General
-
-Secure password hashing (bcrypt).
-
-Role-based route protection (JWT + middleware).
-
-Complete ride history tracking.
-
-📂 Project Structure
+## 🗂️ Project Structure
+<pre>
 src/
-├── App/
-| |-modules/
-│ |   ├── auth/        
-│ |   ├── user/        
-│ |   ├── driver/      
-│ |   ├── ride/        
-| | middlewares/     
-| |-config/          
-| |-utils/           
-├── app.ts 
-├── server.ts          
+|--app
+    ├── config/ # Environment Variable Config
+    ├── errorhelpers/ # Custom error functionality
+    ├── helpers/ # All occur error functionality
+    ├── interfaces/ # All global interfaces
+    ├── middleware/ # All middlewares
+    ├── modules/ # All modules
+    ├── routes/ # API route definitions
+    ├── utils/ # All utility functionality
+├── app.ts # app setup
+└── server.ts # Entry point
+</pre>
 
-⚙️ Setup Instructions
-1️⃣ Clone the repository
-git clone https://github.com/tzmehedy/ride-bookings-API.git
-cd ride-booking-api
+## 🔧 Core Features
 
-2️⃣ Install dependencies
-npm install
+- 🔓 User login functionality. (JWT Login and password hasing).
+- 👨🏻 Role based middleware.
+- 🚗 Ride request.
+- ✅ Autometic give driver if they are available for give ride.
+- ❌ Ride Cancelation rules.
+- 💵 Payment functionality after completing a ride.
+- 🔍 History of Ride
 
-3️⃣ Configure environment variables
+## 🌐 API Endpoints
+    
+    
 
-Create a .env file in the project root:
+**Getting Started**
+- git clone [https://github.com/your-username/library-management-api.git](https://github.com/tzmehedy/ride-bookings-API.git) 
+- cd ride-bookings-API**
+- npm install**
+
+**Run**
+- npm run dev        # Development
+- npm run build      # Build
+
+**Live Link**
+- [https://library-management-server-omega-hazel.vercel.app/](https://ride-bookings.vercel.app/)
 
 
-4️⃣ Run the server
-npm run dev   # development mode
-npm run build # build for production
-npm start     # production mode
 
-🚀 API Endpoints
-🔐 Auth
 
-POST /auth/register – Register (admin/rider/driver).
 
-POST /auth/login – Login & get JWT.
 
-🧍 Rider
-
-POST /rides/request – Request a ride.
-
-PATCH /rides/cancel/:id – Cancel a ride.
-
-GET /rides/me – View ride history.
-
-🚗 Driver
-POST /driver/request - Register driver
-
-PATCH /rides/approve/:id – Accept a ride.
-
-PATCH /rides/:id/status – Update ride status.
- 
-🛠 Admin
-
-GET /users – View all users.
-
-PATCH /drivers/approve/:id – Approve/suspend driver.
-
-PATCH /users/block/:id – Block/unblock user.
-
-GET /rides – View all rides.
