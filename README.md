@@ -51,11 +51,48 @@ src/
 - 🔍 History of Ride
 
 ## 🌐 API Endpoints
+<pre>
+    Base API: 
+        # https://ride-bookings.vercel.app/api/v1
+    
+    1. 👤 User:- 
+            # /user
+                # POST /register --> User Register
+                # GET /all-user -->  Get All Users
+                # PATCH /block/:id --> Block A Specific User
+    2. 🔐 Auth:-
+            # /auth
+                # POST /login --> User Login
+                # POST /logout --> User Logout
+    3. 🚗 Ride:
+            # /rides
+                # POST /request --> Ride Request
+                # POST /:id --> Update Ride Status
+                # GET /me/:id --> Get A Specific Ride Information Using ID
+                # POST /cancel/:id --> Cancel A Specific Ride
+    4. 🛞 Driver:
+            # /drivers
+                # POST /register/:id --> Request for Driving Role
+                # PATCH /approve/:id --> Accept OR Reject Drivier Application for Driving
+                # GET / --> Get All Drivers Information
+                # POST /setAvailability/:driverId --> Driver Can Set His Availability
+                # GET /viewMyEarning/:driverId --> Driver Can View His Earning History
+    5. 💵 Payment:
+            # /payment
+                # POST /init-payment/:rideId --> Get Payment URL
+                # POST /success --> Payment Success 
+                # POST /cancel --> Payment Cancel 
+                # POST /failed --> Payment Failed 
+                # POST /validate-payment --> IPN Payment Validate 
+    
+    
+    
+</pre>
     
     
 
 **Getting Started**
-- git clone [https://github.com/your-username/library-management-api.git](https://github.com/tzmehedy/ride-bookings-API.git) 
+- git clone [https://github.com/tzmehedy/ride-bookings-API.git](https://github.com/tzmehedy/ride-bookings-API.git) 
 - cd ride-bookings-API**
 - npm install**
 
@@ -64,7 +101,7 @@ src/
 - npm run build      # Build
 
 **Live Link**
-- [https://library-management-server-omega-hazel.vercel.app/](https://ride-bookings.vercel.app/)
+- [https://ride-bookings.vercel.app/](https://ride-bookings.vercel.app/)
 
 
 
