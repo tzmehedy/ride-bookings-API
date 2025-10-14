@@ -21,10 +21,7 @@ const appError_1 = __importDefault(require("../../errorhelpers/appError"));
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const requestRide = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.user.userId;
-    if (userId !== req.body.userId) {
-        throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, "Forbidden Access.");
-    }
-    const rideRequestInfo = yield ride_services_1.rideServices.requestRide(req.body);
+    const rideRequestInfo = yield ride_services_1.rideServices.requestRide(req.body, userId);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,

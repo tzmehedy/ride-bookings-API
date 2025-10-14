@@ -7,6 +7,7 @@ import { Ride } from "./ride.model";
 import { Payment } from "../payment/payment.model";
 import { sslCommerzServices } from "../sslcommerz/sslCommerz.services";
 import { ISSLCommerz } from "../sslcommerz/sslCommerz.interface";
+import { PaymentStatus } from "../payment/payment.interface";
 
 const generateTransitionId = () => {
   return `transId_${Date.now()}_${Math.floor(Math.random()*10000)}`;
@@ -136,13 +137,69 @@ const rideMe = async (id: string) => {
 };
 
 const cancelRide = async (id: string) => {
-  const rideInfo = await Ride.findByIdAndUpdate(
-    id,
-    { ride_status: RideStatus.Canceled },
-    { new: true }
-  );
-  await Driver.findByIdAndDelete(rideInfo?.driver, { availability: true });
-  return rideInfo;
+  const session = await Ride.startSession()
+  session.startTransaction()
+
+  try {
+    const isRideExist = await Ride.findById(id);
+
+    if (!isRideExist) {
+      throw new AppError(
+        httpStatusCode.BAD_REQUEST,
+        "The ride does not exist."
+      );
+    }
+
+    if (
+      isRideExist.ride_status === RideStatus.In_Transit ||
+      isRideExist.ride_status === RideStatus.Picked_Up
+    ) {
+      throw new AppError(
+        httpStatusCode.BAD_REQUEST,
+        "You already in a ride. You can't cancel the ride."
+      );
+    }
+
+    if (isRideExist.ride_status === RideStatus.Completed) {
+      throw new AppError(
+        httpStatusCode.BAD_REQUEST,
+        "You already complete the ride."
+      );
+    }
+
+    if (isRideExist.ride_status === RideStatus.Canceled) {
+      throw new AppError(
+        httpStatusCode.BAD_REQUEST,
+        "You already cancel the ride."
+      );
+    }
+
+    const updatedRideInfo = await Ride.findByIdAndUpdate(
+      id,
+      { ride_status: RideStatus.Canceled },
+      { new: true, session }
+    );
+
+    await Driver.findByIdAndUpdate(updatedRideInfo?.driver, {
+      availability: true,
+    }, {session});
+
+    await Payment.findOneAndUpdate(
+      { ride: updatedRideInfo?._id },
+      {
+        paymentStatus: PaymentStatus.CANCEL
+      },{session}
+    );
+
+    await session.commitTransaction()
+    session.endSession()
+    return updatedRideInfo;
+    
+  } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
+    throw error
+  }
 };
 
 export const rideServices = {

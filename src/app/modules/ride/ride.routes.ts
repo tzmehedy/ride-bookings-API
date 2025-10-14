@@ -6,9 +6,9 @@ import { IRole } from "../user/user.interface";
 const router = Router()
 
 router.post("/request", checkAuth(IRole.RIDER), rideControllers.requestRide)
-router.patch("/:id", checkAuth(IRole.DRIVER), rideControllers.updateRideStatus)
+router.post("/:id", checkAuth(IRole.DRIVER), rideControllers.updateRideStatus)
 router.get("/me/:id", checkAuth(IRole.RIDER), rideControllers.rideMe)
 
-router.patch("/cancel/:id", checkAuth(IRole.DRIVER, IRole.RIDER), rideControllers.cancelRide)
+router.post("/cancel/:id", checkAuth(IRole.DRIVER, IRole.RIDER), rideControllers.cancelRide)
 
 export const rideRoutes = router
