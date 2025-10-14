@@ -10,13 +10,12 @@ import { ISSLCommerz } from "../sslcommerz/sslCommerz.interface";
 import { PaymentStatus } from "../payment/payment.interface";
 
 const generateTransitionId = () => {
-  return `transId_${Date.now()}_${Math.floor(Math.random()*10000)}`;
+  return `transId_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
 };
 
 const requestRide = async (payload: Partial<IRide>, userId: string) => {
-
-  const session = await Ride.startSession()
-  session.startTransaction()
+  const session = await Ride.startSession();
+  session.startTransaction();
 
   try {
     const allAvailableDriver = await Driver.find({
@@ -51,37 +50,48 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
 
     const transitionId = generateTransitionId();
 
-    const rideRequestInfo = await Ride.create([{
-      ...payload,
-      user: userId,
-      driver: availableDriver._id,
-      ride_status: RideStatus.Accepted,
-    }], {session});
+    const rideRequestInfo = await Ride.create(
+      [
+        {
+          ...payload,
+          user: userId,
+          driver: availableDriver._id,
+          ride_status: RideStatus.Accepted,
+        },
+      ],
+      { session }
+    );
 
-    
+    await Driver.findByIdAndUpdate(
+      availableDriver._id,
+      {
+        rideId: [...availableDriver.rideId, rideRequestInfo[0]._id],
+        availability: false,
+      },
+      { session }
+    );
 
-    await Driver.findByIdAndUpdate(availableDriver._id, {
-      rideId: [...availableDriver.rideId, rideRequestInfo[0]._id],
-      availability: false,
-    }, {session});
-
-    const paymentInfo = await Payment.create([{
-      ride: rideRequestInfo[0]._id,
-      transitionId,
-      amount: rideRequestInfo[0].price,
-    }], {session});
+    const paymentInfo = await Payment.create(
+      [
+        {
+          ride: rideRequestInfo[0]._id,
+          transitionId,
+          amount: rideRequestInfo[0].price,
+        },
+      ],
+      { session }
+    );
 
     const updatedRideInfo = await Ride.findByIdAndUpdate(
       rideRequestInfo[0]._id,
       {
         payment: paymentInfo[0]._id,
       },
-      { new: true, runValidators: true, session}
+      { new: true, runValidators: true, session }
     )
       .populate("user", "name email phone")
       .populate("driver", "approval_status online_status vehicle_info")
       .populate("payment");
-
 
     const sslCommerzPayload: ISSLCommerz = {
       amount: (updatedRideInfo?.payment as any).amount,
@@ -89,36 +99,33 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
       name: (updatedRideInfo?.user as any).name,
       email: (updatedRideInfo?.user as any).email,
       phone: (updatedRideInfo?.user as any).phone,
-      
     };
 
     const sslPaymentInfo = await sslCommerzServices.initPayment(
       sslCommerzPayload
-    ); 
+    );
 
-    await session.commitTransaction()
-    session.endSession()
+    await session.commitTransaction();
+    session.endSession();
 
     return {
       paymentUrl: sslPaymentInfo.GatewayPageURL,
       rideInfo: updatedRideInfo,
     };
-    
   } catch (error) {
-    await session.abortTransaction()
-    session.endSession()
-    throw error 
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
 };
 
 const updateRideStatus = async (id: string, status: string) => {
-
-    const updatedInfo = await Ride.findByIdAndUpdate(
-      id,
-      { ride_status: status },
-      { new: true }
-    );
-    return updatedInfo;
+  const updatedInfo = await Ride.findByIdAndUpdate(
+    id,
+    { ride_status: status },
+    { new: true }
+  );
+  return updatedInfo;
 };
 
 const rideMe = async (id: string) => {
@@ -137,11 +144,12 @@ const rideMe = async (id: string) => {
 };
 
 const cancelRide = async (id: string) => {
-  const session = await Ride.startSession()
-  session.startTransaction()
+  const session = await Ride.startSession();
+  session.startTransaction();
 
   try {
     const isRideExist = await Ride.findById(id);
+    const paymentInfo = await Payment.findOne({ ride: id });
 
     if (!isRideExist) {
       throw new AppError(
@@ -174,31 +182,45 @@ const cancelRide = async (id: string) => {
       );
     }
 
+    if (
+      paymentInfo?.paymentStatus === PaymentStatus.PAID ||
+      paymentInfo?.paymentStatus === PaymentStatus.CANCEL
+    ) {
+      throw new AppError(
+        httpStatusCode.BAD_REQUEST,
+        "You already pay for the ride, so you can not cancel this ride.To cancel this ride please contact with customer care service 16120"
+      );
+    }
+
     const updatedRideInfo = await Ride.findByIdAndUpdate(
       id,
       { ride_status: RideStatus.Canceled },
-      { new: true, session }
+      { runValidators: true, new: true, session }
     );
 
-    await Driver.findByIdAndUpdate(updatedRideInfo?.driver, {
-      availability: true,
-    }, {session});
+    await Driver.findByIdAndUpdate(
+      updatedRideInfo?.driver,
+      {
+        availability: true,
+      },
+      { session }
+    );
 
     await Payment.findOneAndUpdate(
       { ride: updatedRideInfo?._id },
       {
-        paymentStatus: PaymentStatus.CANCEL
-      },{session}
+        paymentStatus: PaymentStatus.CANCEL,
+      },
+      { session }
     );
 
-    await session.commitTransaction()
-    session.endSession()
+    await session.commitTransaction();
+    session.endSession();
     return updatedRideInfo;
-    
   } catch (error) {
-    await session.abortTransaction()
-    session.endSession()
-    throw error
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
 };
 

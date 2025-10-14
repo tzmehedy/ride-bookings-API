@@ -69,8 +69,27 @@ const driverApproval = catchAsync(
   }
 );
 
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const setAvailability = catchAsync(async(req:Request, res: Response, next: NextFunction)=>{
+  const driverId = req.params.driverId
+  const availability = req.query.availability
+
+  const updatedDriverInfo = await DriverServices.setAvailability(driverId, availability as string)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatusCode.OK,
+    message: "Your availability updated successfully.",
+    data: updatedDriverInfo
+  })
+})
+
+
+
 export const DriverControllers = {
   createDriver,
   driverApproval,
   getAllDrivers,
+  setAvailability,
 };
