@@ -85,6 +85,20 @@ const setAvailability = catchAsync(async(req:Request, res: Response, next: NextF
   })
 })
 
+const viewMyEarning = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const driverId = req.params.driverId
+    const driverInfo = await DriverServices.viewMyEarning(driverId as string)
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatusCode.OK,
+      message: "Your earning history get successfully.",
+      data: driverInfo,
+    });
+  }
+);
+
 
 
 export const DriverControllers = {
@@ -92,4 +106,5 @@ export const DriverControllers = {
   driverApproval,
   getAllDrivers,
   setAvailability,
+  viewMyEarning,
 };

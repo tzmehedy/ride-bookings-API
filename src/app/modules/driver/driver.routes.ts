@@ -9,6 +9,7 @@ router.post("/register/:id",checkAuth(IRole.RIDER), DriverControllers.createDriv
 router.patch("/approve/:id",checkAuth(IRole.ADMIN), DriverControllers.driverApproval)
 router.get("/",checkAuth(IRole.ADMIN), DriverControllers.getAllDrivers)
 router.post("/setAvailability/:driverId", checkAuth(IRole.DRIVER), DriverControllers.setAvailability)
+router.get("/viewMyEarning/:driverId",checkAuth(IRole.DRIVER), DriverControllers.viewMyEarning)
 
 export const driverRoutes = router
 

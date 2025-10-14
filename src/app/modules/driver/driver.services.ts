@@ -4,6 +4,7 @@ import { IApprovalStatus, IDriver } from "./driver.interface";
 import { User } from "../user/user.model";
 import AppError from "../../errorhelpers/appError";
 import { IRole } from "../user/user.interface";
+import mongoose from "mongoose";
 
 const createDriver = async (payload: Partial<IDriver>) => {
   const { userId } = payload;
@@ -52,9 +53,43 @@ const setAvailability = async (driverId: string, availability: string) => {
   return updatedDriverInfo
 };
 
+
+const viewMyEarning = async(driverId : string) =>{
+  const driverInfo = await Driver.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(driverId) } },
+    {
+      $lookup: {
+        from: "rides",
+        localField: "rideId",
+        foreignField: "_id",
+        as: "ridesData",
+      },
+    },
+    {
+      $unwind: "$ridesData",
+    },
+
+    {
+      $match: {
+        "ridesData.ride_status": "Completed",
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        totalEarnings: { $sum: "$ridesData.price" },
+        totalCompletedRides: { $sum: 1 },
+      },
+    },
+  ]);
+
+  return driverInfo[0]
+}
+
 export const DriverServices = {
   createDriver,
   driverApproval,
   getAllDrivers,
   setAvailability,
+  viewMyEarning,
 };
