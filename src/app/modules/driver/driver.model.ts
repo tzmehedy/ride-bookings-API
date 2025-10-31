@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import {IApprovalStatus, IDriver, IIsActive, vehicleInfo } from "./driver.interface";
+import { IDriver, IIsActive, vehicleInfo } from "./driver.interface";
 
 
 const vehicleInfoSchema = new Schema<vehicleInfo>({
@@ -14,11 +14,11 @@ const vehicleInfoSchema = new Schema<vehicleInfo>({
 const driverSchema = new Schema<IDriver>({
   userId: { type: Schema.Types.ObjectId, ref: "User" },
   rideId: { type: [Schema.Types.ObjectId], ref: "Ride", default: [] },
-  approval_status: {
-    type: String,
-    enum: Object.values(IApprovalStatus),
-    default: IApprovalStatus.Pending,
-  },
+  // approval_status: {
+  //   type: String,
+  //   enum: Object.values(IApprovalStatus),
+  //   default: IApprovalStatus.Pending,
+  // },
   online_status: {
     type: String,
     enum: Object.values(IIsActive),
@@ -28,6 +28,7 @@ const driverSchema = new Schema<IDriver>({
   availability: {type:Boolean, default: true}
 },{
     timestamps:true,
+    versionKey: false
 });
 
 export const Driver = model<IDriver>("Driver", driverSchema)

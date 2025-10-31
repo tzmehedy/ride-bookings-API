@@ -18,17 +18,17 @@ export enum IIsActive {
   Blocked = "Blocked",
 }
 
-export enum IApprovalStatus {
-  Accept = "Accept",
-  Reject = "Reject",
-  Pending = "Pending",
-}
+// export enum IApprovalStatus {
+//   Accept = "Accept",
+//   Reject = "Reject",
+//   Pending = "Pending",
+// }
 
 export interface IDriver {
   _id?: Types.ObjectId;
   userId: Types.ObjectId;
   rideId: Types.ObjectId[];
-  approval_status?: IApprovalStatus;
+  // approval_status?: IApprovalStatus;
   online_status?: IIsActive;
   vehicle_info: vehicleInfo;
   availability?: boolean;

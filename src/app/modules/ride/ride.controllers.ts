@@ -48,11 +48,10 @@ const updateRideStatus = catchAsync(
 
 const rideMe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
-    const decodedToken = req.user as JwtPayload;
-    if (decodedToken.userId !== id) {
-      throw new AppError(httpStatusCode.FORBIDDEN, "Forbidden Access.");
-    }
+    const decodedToken = req.user as JwtPayload
+    const id = decodedToken.userId;
+   
+    
 
     const allRideMe = await rideServices.rideMe(id);
 

@@ -16,19 +16,18 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
   session.startTransaction();
 
   try {
-    const allAvailableDriver = await Driver.find({
-      approval_status: "Accept",
-      online_status: "Active",
-      availability: true,
-    });
-    const availableDriver = allAvailableDriver[0];
+    // const allAvailableDriver = await Driver.find({
+    //   online_status: "Active",
+    //   availability: true,
+    // });
+    // const availableDriver = allAvailableDriver[0];
 
-    if (!availableDriver) {
-      throw new AppError(
-        httpStatusCode.NOT_FOUND,
-        "Our All driver is busy now. Please try again."
-      );
-    }
+    // if (!availableDriver) {
+    //   throw new AppError(
+    //     httpStatusCode.NOT_FOUND,
+    //     "Our All driver is busy now. Please try again."
+    //   );
+    // }
 
     const isUserExist = await Ride.find({ user: userId });
 
@@ -53,21 +52,20 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
         {
           ...payload,
           user: userId,
-          driver: availableDriver._id,
           ride_status: RideStatus.Requested,
         },
       ],
       { session }
     );
 
-    await Driver.findByIdAndUpdate(
-      availableDriver._id,
-      {
-        rideId: [...availableDriver.rideId, rideRequestInfo[0]._id],
-        availability: false,
-      },
-      { session }
-    );
+    // await Driver.findByIdAndUpdate(
+    //   availableDriver._id,
+    //   {
+    //     rideId: [...availableDriver.rideId, rideRequestInfo[0]._id],
+    //     availability: false,
+    //   },
+    //   { session }
+    // );
 
     // const paymentInfo = await Payment.create(
     //   [
@@ -125,16 +123,19 @@ const updateRideStatus = async (id: string, status: string) => {
 };
 
 const rideMe = async (id: string) => {
-  const allRides = await Ride.find({ userId: id })
-    .populate({ path: "userId", select: "name email phone" })
+  
+  const allRides = await Ride.find({ user: id })
+    .populate({ path: "user", select: "name email phone" })
     .populate({
-      path: "driverId",
+      path: "driver",
       select: "userId vehicle_Info",
       populate: {
         path: "userId",
         select: "name email phone",
       },
     });
+
+   
 
   return allRides;
 };
