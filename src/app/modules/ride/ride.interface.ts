@@ -9,12 +9,18 @@ export enum RideStatus {
   Canceled = "Canceled"
 }
 
+export enum PaymentMethod {
+  Cash = "Cash",
+  Online = "Online"
+}
+
 
 export interface IRide {
   _id: Types.ObjectId;
   user: Types.ObjectId;
-  driver: Types.ObjectId;
+  driver?: Types.ObjectId;
   payment?: Types.ObjectId,
+  paymentMethod: PaymentMethod,
   pickup_address: string;
   destination_address: string;
   distance: number;

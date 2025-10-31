@@ -1,17 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import httpStatusCode from "http-status-codes";
 import AppError from "../../errorhelpers/appError";
 import { Driver } from "../driver/driver.model";
 import { IRide, RideStatus } from "./ride.interface";
 import { Ride } from "./ride.model";
 import { Payment } from "../payment/payment.model";
-import { sslCommerzServices } from "../sslcommerz/sslCommerz.services";
-import { ISSLCommerz } from "../sslcommerz/sslCommerz.interface";
 import { PaymentStatus } from "../payment/payment.interface";
 
-const generateTransitionId = () => {
-  return `transId_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-};
+// const generateTransitionId = () => {
+//   return `transId_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+// };
 
 const requestRide = async (payload: Partial<IRide>, userId: string) => {
   const session = await Ride.startSession();
@@ -48,7 +46,7 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
       });
     }
 
-    const transitionId = generateTransitionId();
+    // const transitionId = generateTransitionId();
 
     const rideRequestInfo = await Ride.create(
       [
@@ -56,7 +54,7 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
           ...payload,
           user: userId,
           driver: availableDriver._id,
-          ride_status: RideStatus.Accepted,
+          ride_status: RideStatus.Requested,
         },
       ],
       { session }
@@ -71,47 +69,45 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
       { session }
     );
 
-    const paymentInfo = await Payment.create(
-      [
-        {
-          ride: rideRequestInfo[0]._id,
-          transitionId,
-          amount: rideRequestInfo[0].price,
-        },
-      ],
-      { session }
-    );
+    // const paymentInfo = await Payment.create(
+    //   [
+    //     {
+    //       ride: rideRequestInfo[0]._id,
+    //       transitionId,
+    //       amount: rideRequestInfo[0].price,
+    //     },
+    //   ],
+    //   { session }
+    // );
 
-    const updatedRideInfo = await Ride.findByIdAndUpdate(
-      rideRequestInfo[0]._id,
-      {
-        payment: paymentInfo[0]._id,
-      },
-      { new: true, runValidators: true, session }
-    )
-      .populate("user", "name email phone")
-      .populate("driver", "approval_status online_status vehicle_info")
-      .populate("payment");
+    // const updatedRideInfo = await Ride.findByIdAndUpdate(
+    //   rideRequestInfo[0]._id,
+    //   {
+    //     payment: paymentInfo[0]._id,
+    //   },
+    //   { new: true, runValidators: true, session }
+    // )
+    //   .populate("user", "name email phone")
+    //   .populate("driver", "approval_status online_status vehicle_info")
+    //   .populate("payment");
 
-    const sslCommerzPayload: ISSLCommerz = {
-      amount: (updatedRideInfo?.payment as any).amount,
-      transitionID: (updatedRideInfo?.payment as any).transitionId,
-      name: (updatedRideInfo?.user as any).name,
-      email: (updatedRideInfo?.user as any).email,
-      phone: (updatedRideInfo?.user as any).phone,
-    };
+    // const sslCommerzPayload: ISSLCommerz = {
+    //   amount: (updatedRideInfo?.payment as any).amount,
+    //   transitionID: (updatedRideInfo?.payment as any).transitionId,
+    //   name: (updatedRideInfo?.user as any).name,
+    //   email: (updatedRideInfo?.user as any).email,
+    //   phone: (updatedRideInfo?.user as any).phone,
+    // };
 
-    const sslPaymentInfo = await sslCommerzServices.initPayment(
-      sslCommerzPayload
-    );
+    // const sslPaymentInfo = await sslCommerzServices.initPayment(
+    //   sslCommerzPayload
+    // );
 
     await session.commitTransaction();
     session.endSession();
 
-    return {
-      paymentUrl: sslPaymentInfo.GatewayPageURL,
-      rideInfo: updatedRideInfo,
-    };
+    return rideRequestInfo
+    
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -223,6 +219,8 @@ const cancelRide = async (id: string) => {
     throw error;
   }
 };
+
+
 
 export const rideServices = {
   requestRide,

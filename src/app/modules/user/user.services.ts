@@ -13,14 +13,22 @@ const  createUser = async(payload: Partial<IUser>) =>{
         throw new AppError(httpStatusCode.BAD_REQUEST, "User already exist...!!!")
     }
 
-    
-
-
     const hashedPassword = await bcrypt.hash(password as string, envVars.SALT_COUNT)
     
     payload.password = hashedPassword
 
-    const user = await User.create(payload)
+
+    const userPayload: Partial<IUser> = {
+      ...payload,
+      auths: [
+        {
+          providerId: payload.email as string,
+          providerName: "Credentials",
+        },
+      ],
+    };
+
+    const user = await User.create(userPayload)
     return user
 }
 
@@ -45,8 +53,19 @@ const blockedUser = async(id:string)=>{
 
 }
 
+
+const getMe = async(id: string) =>{
+  const userInfo = await User.findById(id)
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { password: pass, ...rest } = userInfo?.toObject() as IUser;
+
+  return rest
+}
+
 export const userServices = {
   createUser,
   getAllUser,
   blockedUser,
+  getMe,
 };

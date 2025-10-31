@@ -18,6 +18,12 @@ interface IEnvConfig {
   ADMIN_PHONE: string;
   ADMIN_NAME: string;
 
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  GOOGLE_CALLBACK_URL: string;
+  EXPRESS_SESSION_SECRET: string;
+  FRONTEND_URL: string;
+
   SSL: {
     SSL_COMMERZ_ID: string;
     SSL_COMMERZ_PASS: string;
@@ -31,6 +37,13 @@ interface IEnvConfig {
     SSL_COMMERZ_BACKEND_CANCEL_URL: string;
     SSL_COMMERZ_BACKEND_FAILED_URL: string;
   };
+
+  CLOUDINARY: {
+    CLOUDINARY_NAME: string;
+    CLOUDINARY_API_KEY: string;
+    CLOUDINARY_API_SECRET: string;
+  };
+  GOOGLE_API_KEY:string
 }
 
 const loadEnvVars = ():IEnvConfig =>{
@@ -47,6 +60,11 @@ const loadEnvVars = ():IEnvConfig =>{
       "ADMIN_PASS",
       "ADMIN_PHONE",
       "ADMIN_NAME",
+      "GOOGLE_CLIENT_ID",
+      "GOOGLE_CLIENT_SECRET",
+      "GOOGLE_CALLBACK_URL",
+      "EXPRESS_SESSION_SECRET",
+      "FRONTEND_URL",
       "SSL_COMMERZ_ID",
       "SSL_COMMERZ_PASS",
       "SSL_COMMERZ_PAYMENT_API",
@@ -57,7 +75,11 @@ const loadEnvVars = ():IEnvConfig =>{
       "SSL_COMMERZ_FRONTEND_FAILED_URL",
       "SSL_COMMERZ_BACKEND_SUCCESS_URL",
       "SSL_COMMERZ_BACKEND_CANCEL_URL",
-      "SSL_COMMERZ_BACKEND_FAILED_URL"
+      "SSL_COMMERZ_BACKEND_FAILED_URL",
+      "CLOUDINARY_NAME",
+      "CLOUDINARY_API_KEY",
+      "CLOUDINARY_API_SECRET",
+      "GOOGLE_API_KEY",
     ];
 
     requiredEnvVar.forEach(key=>{
@@ -82,21 +104,41 @@ const loadEnvVars = ():IEnvConfig =>{
       ADMIN_PHONE: process.env.ADMIN_PHONE as string,
       ADMIN_NAME: process.env.ADMIN_NAME as string,
 
+      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
+      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
+      GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
+      EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
+      FRONTEND_URL: process.env.FRONTEND_URL as string,
+
       SSL: {
         SSL_COMMERZ_ID: process.env.SSL_COMMERZ_ID as string,
         SSL_COMMERZ_PASS: process.env.SSL_COMMERZ_PASS as string,
         SSL_COMMERZ_PAYMENT_API: process.env.SSL_COMMERZ_PAYMENT_API as string,
         SSL_COMMERZ_VALIDATION_API: process.env
           .SSL_COMMERZ_VALIDATION_API as string,
-        SSL_COMMERZ_VALIDATE_URL: process.env.SSL_COMMERZ_VALIDATE_URL as string,
+        SSL_COMMERZ_VALIDATE_URL: process.env
+          .SSL_COMMERZ_VALIDATE_URL as string,
 
-        SSL_COMMERZ_FRONTEND_SUCCESS_URL: process.env.SSL_COMMERZ_FRONTEND_SUCCESS_URL as string,
-        SSL_COMMERZ_FRONTEND_CANCEL_URL: process.env.SSL_COMMERZ_FRONTEND_CANCEL_URL as string,
-        SSL_COMMERZ_FRONTEND_FAILED_URL: process.env.SSL_COMMERZ_FRONTEND_FAILED_URL as string,
-        SSL_COMMERZ_BACKEND_SUCCESS_URL: process.env.SSL_COMMERZ_BACKEND_SUCCESS_URL as string,
-        SSL_COMMERZ_BACKEND_CANCEL_URL: process.env.SSL_COMMERZ_BACKEND_CANCEL_URL as string,
-        SSL_COMMERZ_BACKEND_FAILED_URL: process.env.SSL_COMMERZ_BACKEND_FAILED_URL as string
+        SSL_COMMERZ_FRONTEND_SUCCESS_URL: process.env
+          .SSL_COMMERZ_FRONTEND_SUCCESS_URL as string,
+        SSL_COMMERZ_FRONTEND_CANCEL_URL: process.env
+          .SSL_COMMERZ_FRONTEND_CANCEL_URL as string,
+        SSL_COMMERZ_FRONTEND_FAILED_URL: process.env
+          .SSL_COMMERZ_FRONTEND_FAILED_URL as string,
+        SSL_COMMERZ_BACKEND_SUCCESS_URL: process.env
+          .SSL_COMMERZ_BACKEND_SUCCESS_URL as string,
+        SSL_COMMERZ_BACKEND_CANCEL_URL: process.env
+          .SSL_COMMERZ_BACKEND_CANCEL_URL as string,
+        SSL_COMMERZ_BACKEND_FAILED_URL: process.env
+          .SSL_COMMERZ_BACKEND_FAILED_URL as string,
       },
+
+      CLOUDINARY: {
+        CLOUDINARY_NAME: process.env.CLOUDINARY_NAME as string,
+        CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
+        CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
+      },
+      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY as string
     };
 }
 

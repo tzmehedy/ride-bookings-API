@@ -7,7 +7,7 @@ import { createUserTokens } from '../../utils/userTokens';
 
 
 const credentialsLogin = async(payload: Partial<IUser>) =>{
-    const {email, password} = payload
+    const {email, password} = payload 
 
     const isUserExist = await User.findOne({email})
 
@@ -15,7 +15,7 @@ const credentialsLogin = async(payload: Partial<IUser>) =>{
         throw new AppError(httpStatusCode.NOT_FOUND, "The email address does not exist")
     }
 
-    const isMatchedPassword = await bcrypt.compare(password as string, isUserExist.password)
+    const isMatchedPassword = await bcrypt.compare(password as string, isUserExist.password as string)
 
     if(!isMatchedPassword){
         throw new AppError(httpStatusCode.NOT_FOUND, "The password does not matched")
@@ -34,7 +34,6 @@ const credentialsLogin = async(payload: Partial<IUser>) =>{
 
 
 }
-
 
 export const AuthServices = {
     credentialsLogin

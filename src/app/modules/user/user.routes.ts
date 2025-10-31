@@ -5,6 +5,7 @@ import { createZodSchema } from "./user.validates";
 import { checkAuth } from "../../middlewares/checkAuth";
 import { IRole } from "./user.interface";
 
+
 const router = Router()
 
 router.post("/register", validationRequest(createZodSchema), userControllers.createUser)
@@ -12,5 +13,7 @@ router.post("/register", validationRequest(createZodSchema), userControllers.cre
 router.get("/all-users", checkAuth(IRole.ADMIN), userControllers.getAllUser)
 
 router.patch("/block/:id", checkAuth(IRole.ADMIN), userControllers.blockedUser)
+
+router.get("/me", checkAuth(IRole.ADMIN, IRole.DRIVER, IRole.RIDER), userControllers.getMe)
 
 export const userRoutes = router
