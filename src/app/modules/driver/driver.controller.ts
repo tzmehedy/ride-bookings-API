@@ -53,6 +53,20 @@ const getAllDrivers = catchAsync(async (req: Request, res: Response, next: NextF
         data: allDrivers
     })
 })
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getSingleDriver = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
+  const decodedToken = req.user as JwtPayload
+  const userId = decodedToken.userId
+
+  const driverInfo = await DriverServices.getSingleDriver(userId)
+
+    sendResponse(res, {
+        statusCode: httpStatusCode.OK,
+        success:true,
+        message: "Single driver info get successfully",
+        data: driverInfo
+    })
+})
 
 const driverApproval = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -109,4 +123,5 @@ export const DriverControllers = {
   getAllDrivers,
   setAvailability,
   viewMyEarning,
+  getSingleDriver
 };
