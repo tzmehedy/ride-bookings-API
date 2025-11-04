@@ -133,7 +133,7 @@ const rideMe = async (id: string) => {
         path: "userId",
         select: "name email phone",
       },
-    });
+    }).sort({ createdAt : -1})
 
    
 

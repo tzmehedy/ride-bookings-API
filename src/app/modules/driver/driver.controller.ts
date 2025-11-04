@@ -12,7 +12,9 @@ import { Types } from 'mongoose';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const createDriver = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
 
-  const userId = req.params.id
+  const decodedToken = req.user as JwtPayload
+
+  const userId = decodedToken.userId
   
   const {vehicle_info} = req.body 
 

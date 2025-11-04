@@ -1,24 +1,31 @@
 import httpStatusCode from "http-status-codes";
 import { Driver } from "./driver.model";
 import { IApprovalStatus, IDriver } from "./driver.interface";
-import { User } from "../user/user.model";
 import AppError from "../../errorhelpers/appError";
-import { IRole } from "../user/user.interface";
+// import { IRole } from "../user/user.interface";
 import mongoose from "mongoose";
 
 const createDriver = async (payload: Partial<IDriver>) => {
   const { userId } = payload;
 
-  const isUserExist = await User.findById(userId);
+  const isUserExist = await Driver.findOne({userId});
 
-  if (!isUserExist) {
+  if (isUserExist && isUserExist.approval_status === IApprovalStatus.Pending) {
     throw new AppError(
       httpStatusCode.NOT_FOUND,
-      "The user does not exist...!!!"
+      "You already requested for drive. Please wait until admin will approve you."
+    );
+  }
+  if (isUserExist && isUserExist.approval_status === IApprovalStatus.Accept) {
+    throw new AppError(
+      httpStatusCode.NOT_FOUND,
+      "Your request for drive already accepted."
     );
   }
 
-  await User.findByIdAndUpdate(userId, { role: IRole.DRIVER }, { new: true });
+
+
+  // await User.findByIdAndUpdate(userId, { role: IRole.DRIVER }, { new: true });
 
   const driverInfo = await Driver.create(payload);
   return driverInfo;

@@ -17,5 +17,6 @@ export const sendResponse = async <T>(res: Response, data: ISendResponse<T>) => 
     success: data.success,
     message: data.message,
     data: data.data,
+    statusCode: data.statusCode
   });
 };
