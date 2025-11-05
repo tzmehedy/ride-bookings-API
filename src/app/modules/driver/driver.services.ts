@@ -33,9 +33,9 @@ const createDriver = async (payload: Partial<IDriver>) => {
 
 
 
-const getAllDrivers = async () => {
-  const allDrivers = await Driver.find().populate("userId");
-  return allDrivers;
+const getRequestedDrivers = async () => {
+  const requestedDrivers = await Driver.find({ approval_status : IApprovalStatus.Pending}).populate("userId", "name email phone");
+  return requestedDrivers;
 };
 
 const driverApproval = async (userId: string) => {
@@ -51,9 +51,9 @@ const driverApproval = async (userId: string) => {
 };
 
 const getSingleDriver = async(userId: string) => {
-  const driverInfo = await Driver.findOne({userId}).populate("userId")
+  const driverInfo = await Driver.findOne({userId}).populate("userId", "name email phone")
+  
   return driverInfo
-
 
 }
 
@@ -105,7 +105,7 @@ const viewMyEarning = async(driverId : string) =>{
 export const DriverServices = {
   createDriver,
   driverApproval,
-  getAllDrivers,
+  getRequestedDrivers,
   getSingleDriver,
   setAvailability,
   viewMyEarning,

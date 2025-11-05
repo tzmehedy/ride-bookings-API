@@ -43,14 +43,14 @@ const createDriver = catchAsync(async(req:Request, res:Response, next:NextFuncti
 })
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getAllDrivers = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
-    const allDrivers = await DriverServices.getAllDrivers()
+const getRequestedDrivers = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
+  const requestedDrivers = await DriverServices.getRequestedDrivers()
 
     sendResponse(res, {
         statusCode: httpStatusCode.OK,
         success:true,
-        message: "All driver retrieve successfully.",
-        data: allDrivers
+        message: "All requested driver retrieve successfully.",
+        data: requestedDrivers
     })
 })
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -120,7 +120,7 @@ const viewMyEarning = catchAsync(
 export const DriverControllers = {
   createDriver,
   driverApproval,
-  getAllDrivers,
+  getRequestedDrivers,
   setAvailability,
   viewMyEarning,
   getSingleDriver
