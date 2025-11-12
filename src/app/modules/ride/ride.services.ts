@@ -46,7 +46,7 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
       });
     }
 
-    // const transitionId = generateTransitionId();
+
 
     const rideRequestInfo = await Ride.create(
       [
@@ -58,49 +58,6 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
       ],
       { session }
     );
-
-    // await Driver.findByIdAndUpdate(
-    //   availableDriver._id,
-    //   {
-    //     rideId: [...availableDriver.rideId, rideRequestInfo[0]._id],
-    //     availability: false,
-    //   },
-    //   { session }
-    // );
-
-    // const paymentInfo = await Payment.create(
-    //   [
-    //     {
-    //       ride: rideRequestInfo[0]._id,
-    //       transitionId,
-    //       amount: rideRequestInfo[0].price,
-    //     },
-    //   ],
-    //   { session }
-    // );
-
-    // const updatedRideInfo = await Ride.findByIdAndUpdate(
-    //   rideRequestInfo[0]._id,
-    //   {
-    //     payment: paymentInfo[0]._id,
-    //   },
-    //   { new: true, runValidators: true, session }
-    // )
-    //   .populate("user", "name email phone")
-    //   .populate("driver", "approval_status online_status vehicle_info")
-    //   .populate("payment");
-
-    // const sslCommerzPayload: ISSLCommerz = {
-    //   amount: (updatedRideInfo?.payment as any).amount,
-    //   transitionID: (updatedRideInfo?.payment as any).transitionId,
-    //   name: (updatedRideInfo?.user as any).name,
-    //   email: (updatedRideInfo?.user as any).email,
-    //   phone: (updatedRideInfo?.user as any).phone,
-    // };
-
-    // const sslPaymentInfo = await sslCommerzServices.initPayment(
-    //   sslCommerzPayload
-    // );
 
     await session.commitTransaction();
     session.endSession();
@@ -229,7 +186,7 @@ const getRequestedRides = async(userId: string) =>{
     throw new AppError(httpStatusCode.BAD_REQUEST, "You are not approved for driver.")
   }
 
-  const requestedRides = await Ride.find({ ride_status : "Requested"})
+  const requestedRides = await Ride.find({ ride_status : "Requested"}).populate("user", "name email phone")
 
   return requestedRides
 

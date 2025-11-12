@@ -117,6 +117,30 @@ const viewMyEarning = catchAsync(
 );
 
 
+const acceptRide = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload
+    const driverId = decodedToken.userId 
+
+    const rideId = req.params.id 
+
+    const acceptedRideInfo = await DriverServices.acceptRide(rideId, driverId)
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatusCode.OK,
+      message: "The ride is successfully accepted.",
+      data: acceptedRideInfo,
+    });
+  }
+);
+
+
+
+
+
+
 
 export const DriverControllers = {
   createDriver,
@@ -124,5 +148,6 @@ export const DriverControllers = {
   getRequestedDrivers,
   setAvailability,
   viewMyEarning,
-  getSingleDriver
+  getSingleDriver,
+  acceptRide
 };
