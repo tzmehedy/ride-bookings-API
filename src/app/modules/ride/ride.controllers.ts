@@ -79,10 +79,24 @@ const cancelRide = catchAsync(
   }
 );
 
+const getRequestedRides = catchAsync(async(req:Request, res:Response, next: NextFunction)=>{
+  const decodedToken = req.user as JwtPayload
+
+  const userId = decodedToken.userId
+  const requestedRides = await rideServices.getRequestedRides(userId)
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatusCode.OK,
+    message: "The ride requested retrieve successfully.",
+    data: requestedRides
+  })
+})
+
 
 export const rideControllers = {
   requestRide,
   updateRideStatus,
   rideMe,
   cancelRide,
+  getRequestedRides
 };

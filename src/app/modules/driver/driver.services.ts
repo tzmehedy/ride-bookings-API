@@ -2,8 +2,8 @@ import httpStatusCode from "http-status-codes";
 import { Driver } from "./driver.model";
 import { IApprovalStatus, IDriver } from "./driver.interface";
 import AppError from "../../errorhelpers/appError";
-// import { IRole } from "../user/user.interface";
 import mongoose from "mongoose";
+// import { IRole } from "../user/user.interface";
 
 const createDriver = async (payload: Partial<IDriver>) => {
   const { userId } = payload;
@@ -22,6 +22,12 @@ const createDriver = async (payload: Partial<IDriver>) => {
       "Your request for drive already accepted."
     );
   }
+  if (isUserExist && isUserExist.approval_status === IApprovalStatus.Reject) {
+    throw new AppError(
+      httpStatusCode.NOT_FOUND,
+      "Your request is rejected."
+    );
+  }
 
 
 
@@ -38,15 +44,16 @@ const getRequestedDrivers = async () => {
   return requestedDrivers;
 };
 
-const driverApproval = async (userId: string) => {
+const driverApproval = async (userId: string, status: IApprovalStatus) => {
+  
   const updatedDoc: Partial<IDriver> = {
-    approval_status: IApprovalStatus.Accept,
+    approval_status: status,
   };
 
   const updatedDriverInfo = await Driver.findByIdAndUpdate(userId, updatedDoc, {
     new: true,
   });
-
+  
   return updatedDriverInfo;
 };
 

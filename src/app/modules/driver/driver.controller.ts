@@ -6,7 +6,7 @@ import { sendResponse } from "../../utils/sendResponse";
 import { verifyToken } from '../../utils/jwt';
 import { JwtPayload } from 'jsonwebtoken';
 import AppError from '../../errorhelpers/appError';
-import { IDriver } from './driver.interface';
+import { IApprovalStatus, IDriver } from './driver.interface';
 import { Types } from 'mongoose';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -72,9 +72,10 @@ const driverApproval = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id
+    const status = req.query.status as IApprovalStatus
     
 
-    const updatedDriverInfo = await DriverServices.driverApproval(userId)
+    const updatedDriverInfo = await DriverServices.driverApproval(userId, status)
     
     sendResponse(res, {
         statusCode: httpStatusCode.OK,

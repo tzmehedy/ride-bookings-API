@@ -6,6 +6,7 @@ import { IRide, RideStatus } from "./ride.interface";
 import { Ride } from "./ride.model";
 import { Payment } from "../payment/payment.model";
 import { PaymentStatus } from "../payment/payment.interface";
+import { IApprovalStatus } from "../driver/driver.interface";
 
 // const generateTransitionId = () => {
 //   return `transId_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
@@ -221,6 +222,19 @@ const cancelRide = async (id: string) => {
   }
 };
 
+const getRequestedRides = async(userId: string) =>{
+  const isDriverApproved = await Driver.findOne({userId})
+
+  if (isDriverApproved?.approval_status !== IApprovalStatus.Accept){
+    throw new AppError(httpStatusCode.BAD_REQUEST, "You are not approved for driver.")
+  }
+
+  const requestedRides = await Ride.find({ ride_status : "Requested"})
+
+  return requestedRides
+
+}
+
 
 
 export const rideServices = {
@@ -228,4 +242,5 @@ export const rideServices = {
   updateRideStatus,
   rideMe,
   cancelRide,
+  getRequestedRides
 };
