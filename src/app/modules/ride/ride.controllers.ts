@@ -30,11 +30,16 @@ const requestRide = catchAsync(
 
 const updateRideStatus = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
-    const status = req.query.status;
+    const rideId = req.params.id;
+    const status = req.body.status;
+    const decodedToken = req.user  as JwtPayload
+
+    const driverId = decodedToken.userId 
+    
     const updatedInfo = await rideServices.updateRideStatus(
-      id,
-      status as string
+      rideId,
+      status as string,
+      driverId
     );
     sendResponse(res, {
       statusCode: httpStatusCode.OK,
@@ -52,7 +57,6 @@ const rideMe = catchAsync(
     const id = decodedToken.userId;
    
     
-
     const allRideMe = await rideServices.rideMe(id);
 
     sendResponse(res, {

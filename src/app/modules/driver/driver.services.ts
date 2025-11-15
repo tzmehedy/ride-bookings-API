@@ -1,3 +1,5 @@
+
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatusCode from "http-status-codes";
 import { Driver } from "./driver.model";
@@ -9,6 +11,7 @@ import { RideStatus } from "../ride/ride.interface";
 import { Payment } from "../payment/payment.model";
 import { ISSLCommerz } from "../sslcommerz/sslCommerz.interface";
 import { sslCommerzServices } from "../sslcommerz/sslCommerz.services";
+
 // import { IRole } from "../user/user.interface";
 
 
@@ -69,10 +72,20 @@ const driverApproval = async (userId: string, status: IApprovalStatus) => {
 };
 
 const getSingleDriver = async (userId: string) => {
-  const driverInfo = await Driver.findOne({ userId }).populate("userId", "name email phone")
+  const driverInfo = await Driver.findOne({ userId })
+  .populate("userId", "name email phone")
+  .populate({
+    path: "rideId",
+    populate: {
+      path: "user payment",
+      select: "name email phone paymentStatus",
+    },
+    options: {
+      sort: { createdAt: -1 }
+    }
+  })
 
   return driverInfo
-
 }
 
 const setAvailability = async (driverId: string, availability: string) => {
@@ -213,6 +226,8 @@ const acceptRide = async (rideId: string, driverId: string) => {
   }
 
 }
+
+
 
 export const DriverServices = {
   createDriver,

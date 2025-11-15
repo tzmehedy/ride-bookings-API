@@ -8,27 +8,13 @@ import { Payment } from "../payment/payment.model";
 import { PaymentStatus } from "../payment/payment.interface";
 import { IApprovalStatus } from "../driver/driver.interface";
 
-// const generateTransitionId = () => {
-//   return `transId_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-// };
+
 
 const requestRide = async (payload: Partial<IRide>, userId: string) => {
   const session = await Ride.startSession();
   session.startTransaction();
 
   try {
-    // const allAvailableDriver = await Driver.find({
-    //   online_status: "Active",
-    //   availability: true,
-    // });
-    // const availableDriver = allAvailableDriver[0];
-
-    // if (!availableDriver) {
-    //   throw new AppError(
-    //     httpStatusCode.NOT_FOUND,
-    //     "Our All driver is busy now. Please try again."
-    //   );
-    // }
 
     const isUserExist = await Ride.find({ user: userId });
 
@@ -71,13 +57,28 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
   }
 };
 
-const updateRideStatus = async (id: string, status: string) => {
-  const updatedInfo = await Ride.findByIdAndUpdate(
-    id,
-    { ride_status: status },
-    { new: true }
-  );
-  return updatedInfo;
+const updateRideStatus = async (rideId: string, status: string, driverId:string) => {
+ 
+  
+    if(status === RideStatus.Completed){
+      await Driver.findOneAndUpdate({userId:driverId}, {
+        availability: true
+      })
+      const rideInfo = await Ride.findById(rideId)
+
+      if (rideInfo?.paymentMethod === "Cash"){
+        await Payment.findOneAndUpdate({ ride: rideId }, {
+          paymentStatus: PaymentStatus.PAID
+        })
+      }
+    }
+
+    const updatedInfo = await Ride.findByIdAndUpdate(
+      rideId,
+      { ride_status: status },
+      { new: true }
+    );
+    return updatedInfo
 };
 
 const rideMe = async (id: string) => {
@@ -86,12 +87,14 @@ const rideMe = async (id: string) => {
     .populate({ path: "user", select: "name email phone" })
     .populate({
       path: "driver",
-      select: "userId vehicle_Info",
+      select: "vehicle_info",
       populate: {
         path: "userId",
         select: "name email phone",
       },
-    }).sort({ createdAt : -1})
+    })
+    .populate("payment")
+    .sort({ createdAt : -1})
 
    
 
