@@ -10,7 +10,7 @@ import { sslCommerzServices } from '../sslcommerz/sslCommerz.services';
 
 const initPayment = catchAsync(async (req: Request, res: Response) => {
   const rideId = req.params.rideId
-
+  
   const paymentURL = await paymentServices.initPayment(rideId)
 
   sendResponse(res, {
@@ -43,10 +43,11 @@ const validatePayment = catchAsync(async (req: Request, res: Response) => {
 
 const successPayment = catchAsync(async(req: Request, res: Response)=>{
     const query = req.query
+     
     const result = await paymentServices.successPayment(query as Record<string, string>)
 
     if(result.success){
-        res.redirect(envVars.SSL.SSL_COMMERZ_FRONTEND_SUCCESS_URL)
+      res.redirect(`${envVars.SSL.SSL_COMMERZ_FRONTEND_SUCCESS_URL}?transitionId=${result.data.transitionId}&paymentStatus=${result.data.paymentStatus}&price=${result.data.amount}`)
     }
 })
 

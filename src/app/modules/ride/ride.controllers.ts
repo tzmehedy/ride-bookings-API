@@ -1,16 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import httpStatusCode from "http-status-codes";
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { rideServices } from "./ride.services";
 import { sendResponse } from "../../utils/sendResponse";
-import AppError from "../../errorhelpers/appError";
 import { JwtPayload } from "jsonwebtoken";
-import { envVars } from "../../config/env";
-import axios from "axios";
 
 
 const requestRide = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     const decodedToken = req.user as JwtPayload;
 
@@ -29,6 +27,7 @@ const requestRide = catchAsync(
 
 
 const updateRideStatus = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     const rideId = req.params.id;
     const status = req.body.status;
@@ -52,12 +51,14 @@ const updateRideStatus = catchAsync(
 
 
 const rideMe = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     const decodedToken = req.user as JwtPayload
     const id = decodedToken.userId;
-   
+ 
+    const query = req.query 
     
-    const allRideMe = await rideServices.rideMe(id);
+    const allRideMe = await rideServices.rideMe(id, query as Record<string, string>);
 
     sendResponse(res, {
       statusCode: httpStatusCode.OK,
@@ -70,6 +71,7 @@ const rideMe = catchAsync(
 
 
 const cancelRide = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     const rideId = req.params.id;
     const updatedRideInfo = await rideServices.cancelRide(rideId);
@@ -83,6 +85,7 @@ const cancelRide = catchAsync(
   }
 );
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getRequestedRides = catchAsync(async(req:Request, res:Response, next: NextFunction)=>{
   const decodedToken = req.user as JwtPayload
 

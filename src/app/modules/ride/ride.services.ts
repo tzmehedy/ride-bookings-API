@@ -10,6 +10,7 @@ import { IApprovalStatus } from "../driver/driver.interface";
 
 
 
+
 const requestRide = async (payload: Partial<IRide>, userId: string) => {
   const session = await Ride.startSession();
   session.startTransaction();
@@ -49,7 +50,7 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
     session.endSession();
 
     return rideRequestInfo
-    
+
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -57,33 +58,57 @@ const requestRide = async (payload: Partial<IRide>, userId: string) => {
   }
 };
 
-const updateRideStatus = async (rideId: string, status: string, driverId:string) => {
- 
-  
-    if(status === RideStatus.Completed){
-      await Driver.findOneAndUpdate({userId:driverId}, {
-        availability: true
+const updateRideStatus = async (rideId: string, status: string, driverId: string) => {
+
+
+  if (status === RideStatus.Completed) {
+    await Driver.findOneAndUpdate({ userId: driverId }, {
+      availability: true
+    })
+    const rideInfo = await Ride.findById(rideId)
+
+    if (rideInfo?.paymentMethod === "Cash") {
+      await Payment.findOneAndUpdate({ ride: rideId }, {
+        paymentStatus: PaymentStatus.PAID
       })
-      const rideInfo = await Ride.findById(rideId)
-
-      if (rideInfo?.paymentMethod === "Cash"){
-        await Payment.findOneAndUpdate({ ride: rideId }, {
-          paymentStatus: PaymentStatus.PAID
-        })
-      }
     }
+  }
 
-    const updatedInfo = await Ride.findByIdAndUpdate(
-      rideId,
-      { ride_status: status },
-      { new: true }
-    );
-    return updatedInfo
+  const updatedInfo = await Ride.findByIdAndUpdate(
+    rideId,
+    { ride_status: status },
+    { new: true }
+  );
+  return updatedInfo
 };
 
-const rideMe = async (id: string) => {
+const rideMe = async (id: string, query: Record<string, string>) => {
+  const size = Number(query.size) 
+  const page = Number(query.page)
   
-  const allRides = await Ride.find({ user: id })
+
+  const searchTerm = query.searchTerm || ""
+  const sortByDate = query.sortByDate || ""
+  const rideStatus = query.rideStatus || ""
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const baseQuery:  Record<string, any> = {user: id}
+
+  if(rideStatus){
+    baseQuery.ride_status = rideStatus
+  }
+
+  if(searchTerm){
+    baseQuery.$or = [
+      { destination_address: { $regex: searchTerm, $options: "i" } },
+      { pickup_address: { $regex: searchTerm, $options: "i" } }
+    ]
+  }
+
+  const allRides = await Ride.find(baseQuery)
+    .skip(size * (page - 1))
+    .limit(size)
+    .sort({ createdAt: sortByDate === "asc"? 1 : -1})
     .populate({ path: "user", select: "name email phone" })
     .populate({
       path: "driver",
@@ -94,11 +119,19 @@ const rideMe = async (id: string) => {
       },
     })
     .populate("payment")
-    .sort({ createdAt : -1})
+    
 
-   
+ 
 
-  return allRides;
+  const totalDocument = await Ride.find({user:id}).countDocuments()
+
+
+  return {
+    allRides: allRides, 
+    meta: {
+      numberOfTotalRides: totalDocument
+    }
+  };
 };
 
 const cancelRide = async (id: string) => {
@@ -182,14 +215,14 @@ const cancelRide = async (id: string) => {
   }
 };
 
-const getRequestedRides = async(userId: string) =>{
-  const isDriverApproved = await Driver.findOne({userId})
+const getRequestedRides = async (userId: string) => {
+  const isDriverApproved = await Driver.findOne({ userId })
 
-  if (isDriverApproved?.approval_status !== IApprovalStatus.Accept){
+  if (isDriverApproved?.approval_status !== IApprovalStatus.Accept) {
     throw new AppError(httpStatusCode.BAD_REQUEST, "You are not approved for driver.")
   }
 
-  const requestedRides = await Ride.find({ ride_status : "Requested"}).populate("user", "name email phone")
+  const requestedRides = await Ride.find({ ride_status: "Requested" }).populate("user", "name email phone")
 
   return requestedRides
 

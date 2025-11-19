@@ -9,12 +9,20 @@ import { sslCommerzServices } from '../sslcommerz/sslCommerz.services';
 
 
 const initPayment = async(rideId: string) =>{
+ 
 
   const isPaymentExist = await Payment.findOne({ride:rideId})
+  
 
   if(!isPaymentExist){
     throw new AppError(httpStatusCode.BAD_REQUEST, "Payment Does not exist.")
   }
+
+  if (isPaymentExist.paymentStatus === PaymentStatus.PAID){
+    throw new AppError(httpStatusCode.BAD_REQUEST, "Your already pay for this ride")
+  }
+
+
 
   const rideInfo = await Ride.findById(rideId)
     .populate("user", "name email phone")
@@ -45,17 +53,29 @@ const initPayment = async(rideId: string) =>{
 
 
 const successPayment = async(query: Record<string, string>) =>{
-   await Payment.findOneAndUpdate(
+  
+   const updatedInfo = await Payment.findOneAndUpdate(
       {
         transitionId: query.transitionId,
       },
       {
         paymentStatus: PaymentStatus.PAID 
       },
-    );
+      {
+        new: true
+      }
+    ).populate("ride")
+
+    console.log(updatedInfo)
+
     return {
         success: true,
-        message: "Payment successfully completed."
+        message: "Payment successfully completed.",
+        data: {
+          transitionId: updatedInfo?.transitionId,
+          paymentStatus: updatedInfo?.paymentStatus,
+          amount: updatedInfo?.amount
+        }
     }
 }
 
