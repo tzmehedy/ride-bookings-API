@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatusCode from "http-status-codes";
 import { Driver } from "./driver.model";
-import { IApprovalStatus, IDriver } from "./driver.interface";
+import { IApprovalStatus, IDriver, IIsActive } from "./driver.interface";
 import AppError from "../../errorhelpers/appError";
 import mongoose from "mongoose";
 import { Ride } from "../ride/ride.model";
@@ -88,11 +88,11 @@ const getSingleDriver = async (userId: string) => {
   return driverInfo
 }
 
-const setAvailability = async (driverId: string, availability: string) => {
+const setAvailability = async (driverId: string, status: string) => {
   const updatedDriverInfo = await Driver.findByIdAndUpdate(
     driverId,
     {
-      availability: availability,
+      online_status: status,
     },
     { new: true }
   );
@@ -147,6 +147,10 @@ const acceptRide = async (rideId: string, driverId: string) => {
 
     if (driverInfo?.availability === false) {
       throw new AppError(httpStatusCode.BAD_REQUEST, "You already in a ride. Please complete your ride first, then try another ride.")
+    }
+
+    if(driverInfo?.online_status === IIsActive.InActive){
+      throw new AppError(httpStatusCode.BAD_REQUEST, "You are in inactive mode please turn on your Active mode.")
     }
 
 

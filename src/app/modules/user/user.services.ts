@@ -63,9 +63,26 @@ const getMe = async(id: string) =>{
   return rest
 }
 
+const updateUser = async(id: string,updatedDoc: Partial<IUser>)=>{
+
+  if(updatedDoc.password){
+    const hashedPassword = await bcrypt.hash(updatedDoc.password, envVars.SALT_COUNT)
+    updatedDoc.password = hashedPassword
+  }
+
+  const updatedUserInfo = await User.findByIdAndUpdate(id, updatedDoc, {
+    new: true
+  })
+
+  return updatedUserInfo
+
+
+}
+
 export const userServices = {
   createUser,
   getAllUser,
   blockedUser,
   getMe,
+  updateUser
 };

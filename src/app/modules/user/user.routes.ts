@@ -16,4 +16,6 @@ router.patch("/block/:id", checkAuth(IRole.ADMIN), userControllers.blockedUser)
 
 router.get("/me", checkAuth(IRole.ADMIN, IRole.DRIVER, IRole.RIDER), userControllers.getMe)
 
+router.post("/update-user", checkAuth(IRole.ADMIN, IRole.DRIVER, IRole.RIDER), userControllers.updateUser)
+
 export const userRoutes = router
