@@ -11,7 +11,7 @@ router.post("/approve/:id",checkAuth(IRole.ADMIN), DriverControllers.driverAppro
 router.post("/accept-ride/:id", checkAuth(IRole.DRIVER), DriverControllers.acceptRide)
 router.get("/requested-driver",checkAuth(IRole.ADMIN), DriverControllers.getRequestedDrivers)
 router.get("/me", checkAuth(IRole.DRIVER), DriverControllers.getSingleDriver)
-router.post("/setAvailability/:driverId", checkAuth(IRole.DRIVER), DriverControllers.setAvailability)
+router.post("/setAvailability", checkAuth(IRole.DRIVER), DriverControllers.setAvailability)
 router.get("/viewMyEarning/:driverId",checkAuth(IRole.DRIVER), DriverControllers.viewMyEarning)
 
 export const driverRoutes = router

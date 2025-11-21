@@ -89,13 +89,16 @@ const getSingleDriver = async (userId: string) => {
 }
 
 const setAvailability = async (driverId: string, status: string) => {
-  const updatedDriverInfo = await Driver.findByIdAndUpdate(
-    driverId,
+  
+  const updatedDriverInfo = await Driver.findOneAndUpdate(
+    { userId:driverId},
     {
       online_status: status,
     },
     { new: true }
   );
+
+  
 
   return updatedDriverInfo
 };

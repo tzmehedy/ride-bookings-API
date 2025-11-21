@@ -89,8 +89,10 @@ const driverApproval = catchAsync(
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const setAvailability = catchAsync(async(req:Request, res: Response, next: NextFunction)=>{
-  const driverId = req.params.driverId
-  const status = req.query.status
+  const decodedToken = req.user as JwtPayload
+  const driverId = decodedToken.userId
+  
+  const status = req.body.online_status
 
   const updatedDriverInfo = await DriverServices.setAvailability(driverId, status as string)
 

@@ -26,4 +26,5 @@ export interface IRide {
   distance: number;
   price: number;
   ride_status?: RideStatus;
+  createAt?: Date
 }
