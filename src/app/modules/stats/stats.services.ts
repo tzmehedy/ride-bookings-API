@@ -34,6 +34,7 @@ const getDriverStats = async(id: string) =>{
         {
             $group:{
                 _id: "$_id",
+                totalEarning: { $sum: "$ridesData.price" },
                 count: { $sum: 1 }
             }
         },
@@ -63,6 +64,7 @@ const getDriverStats = async(id: string) =>{
         {
             $group:{
                 _id: "$_id",
+                totalEarning: { $sum: "$ridesData.price" },
                 count: { $sum: 1 }
             }
         },
@@ -90,13 +92,13 @@ const getDriverStats = async(id: string) =>{
                     {"ridesData.createdAt": { $lt: new Date(nextDay) }},
                     {"ridesData.createdAt": { $gt: new Date(previousDay)}},
                 ]
-                
             }
         },
 
         {
             $group:{
                 _id: "$_id",
+                totalEarning: { $sum: "$ridesData.price" },
                 count: { $sum: 1 }
             }
         },
@@ -142,11 +144,9 @@ const getDriverStats = async(id: string) =>{
     ])
 
     return {
-        todayRidesCount: todayRidesCount.length > 0 ? todayRidesCount[0].count : 0,
-
-        sevenDaysAgoRideCount: sevenDaysAgoRideCount.length > 0 ? sevenDaysAgoRideCount[0].count : 0,
-
-        thirtyDaysAgoRideCount: thirtyDaysAgoRideCount.length > 0 ?thirtyDaysAgoRideCount[0].count : 0,
+        todayRidesCount: todayRidesCount[0],
+        sevenDaysAgoRideCount: sevenDaysAgoRideCount[0],
+        thirtyDaysAgoRideCount: thirtyDaysAgoRideCount[0],
         totalEarnings: totalEarnings[0],
     }
 

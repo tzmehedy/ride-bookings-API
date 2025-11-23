@@ -139,6 +139,35 @@ const acceptRide = catchAsync(
 );
 
 
+const updateDriverInfo = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload
+    const userId = decodedToken.userId
+
+    // eslint-disable-next-line prefer-const
+    let { user_info: userUpdatedDoc, vehicle_info: driverUpdatedDoc} = req.body
+
+    const { password, ...rest } = userUpdatedDoc
+
+    if (password === "") {
+      userUpdatedDoc = rest
+    }
+
+    // console.log(userUpdatedDoc, driverUpdatedDoc)
+
+    const updatedDriverInfo = await DriverServices.updateDriverInfo(userId, userUpdatedDoc, driverUpdatedDoc)
+
+    sendResponse(res, {
+      statusCode: httpStatusCode.OK,
+      success: true,
+      message: "The Driver is approve for driving.",
+      data: updatedDriverInfo
+    })
+  }
+);
+
+
 
 
 
@@ -151,5 +180,6 @@ export const DriverControllers = {
   setAvailability,
   viewMyEarning,
   getSingleDriver,
-  acceptRide
+  acceptRide,
+  updateDriverInfo
 };

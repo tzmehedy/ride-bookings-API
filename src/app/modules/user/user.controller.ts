@@ -73,7 +73,16 @@ const getMe = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
 const updateUser = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
   const decodedToken = req.user as JwtPayload
   const userId = decodedToken.userId
-  const updatedDoc = req.body
+
+  let updatedDoc = req.body
+
+  const {password, ...rest} = updatedDoc
+
+  if(password === ""){
+    updatedDoc = rest
+  }
+
+  
 
   const result = await userServices.updateUser(userId, updatedDoc)
 

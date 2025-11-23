@@ -1,5 +1,6 @@
 
 
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatusCode from "http-status-codes";
 import { Driver } from "./driver.model";
@@ -11,6 +12,11 @@ import { RideStatus } from "../ride/ride.interface";
 import { Payment } from "../payment/payment.model";
 import { ISSLCommerz } from "../sslcommerz/sslCommerz.interface";
 import { sslCommerzServices } from "../sslcommerz/sslCommerz.services";
+import { IUser } from "../user/user.interface";
+import { envVars } from "../../config/env";
+
+import bcrypt from "bcryptjs"
+import { User } from "../user/user.model";
 
 // import { IRole } from "../user/user.interface";
 
@@ -73,32 +79,32 @@ const driverApproval = async (userId: string, status: IApprovalStatus) => {
 
 const getSingleDriver = async (userId: string) => {
   const driverInfo = await Driver.findOne({ userId })
-  .populate("userId", "name email phone")
-  .populate({
-    path: "rideId",
-    populate: {
-      path: "user payment",
-      select: "name email phone paymentStatus",
-    },
-    options: {
-      sort: { createdAt: -1 }
-    }
-  })
+    .populate("userId", "name email phone")
+    .populate({
+      path: "rideId",
+      populate: {
+        path: "user payment",
+        select: "name email phone paymentStatus",
+      },
+      options: {
+        sort: { createdAt: -1 }
+      }
+    })
 
   return driverInfo
 }
 
 const setAvailability = async (driverId: string, status: string) => {
-  
+
   const updatedDriverInfo = await Driver.findOneAndUpdate(
-    { userId:driverId},
+    { userId: driverId },
     {
       online_status: status,
     },
     { new: true }
   );
 
-  
+
 
   return updatedDriverInfo
 };
@@ -137,12 +143,12 @@ const viewMyEarning = async (driverId: string) => {
 }
 
 const acceptRide = async (rideId: string, driverId: string) => {
-  
+
   const session = await Payment.startSession()
   session.startTransaction()
 
   try {
-    const driverInfo = await Driver.findOne({userId:driverId})
+    const driverInfo = await Driver.findOne({ userId: driverId })
 
     if (!driverInfo) {
       throw new AppError(httpStatusCode.BAD_REQUEST, "Forbidden Access")
@@ -152,7 +158,7 @@ const acceptRide = async (rideId: string, driverId: string) => {
       throw new AppError(httpStatusCode.BAD_REQUEST, "You already in a ride. Please complete your ride first, then try another ride.")
     }
 
-    if(driverInfo?.online_status === IIsActive.InActive){
+    if (driverInfo?.online_status === IIsActive.InActive) {
       throw new AppError(httpStatusCode.BAD_REQUEST, "You are in inactive mode please turn on your Active mode.")
     }
 
@@ -162,7 +168,7 @@ const acceptRide = async (rideId: string, driverId: string) => {
       {
         rideId: [...driverInfo.rideId, rideId],
         availability: false,
-      }, {new: true, runValidators: true, session},
+      }, { new: true, runValidators: true, session },
     );
 
 
@@ -172,8 +178,8 @@ const acceptRide = async (rideId: string, driverId: string) => {
       ride_status: RideStatus.Accepted,
     }, { new: true, runValidators: true, session })
 
-   
-    
+
+
 
     const transitionId = generateTransitionId()
 
@@ -184,11 +190,11 @@ const acceptRide = async (rideId: string, driverId: string) => {
         ride: updateRiderInfo?._id,
         transitionId,
         amount: updateRiderInfo?.price,
-      }], {session},
+      }], { session },
     );
 
 
-    
+
 
 
     const sslCommerzPayload: ISSLCommerz = {
@@ -205,7 +211,7 @@ const acceptRide = async (rideId: string, driverId: string) => {
 
     await Payment.findByIdAndUpdate(paymentInfo[0]._id, {
       paymentUrl: sslPaymentInfo.GatewayPageURL
-    }, {new: true, runValidators: true, session})
+    }, { new: true, runValidators: true, session })
 
 
 
@@ -223,8 +229,8 @@ const acceptRide = async (rideId: string, driverId: string) => {
     await session.commitTransaction();
     session.endSession();
 
-    return afterPaymentCreateUpdateRideInfo 
-    
+    return afterPaymentCreateUpdateRideInfo
+
 
   } catch (error) {
     await session.abortTransaction();
@@ -232,6 +238,20 @@ const acceptRide = async (rideId: string, driverId: string) => {
     throw error
   }
 
+}
+
+const updateDriverInfo = async (userId: string, updatedDocForUserModel: Partial<IUser>, updatedDocForDriverModel: Partial<IDriver>,) => {
+
+  if (updatedDocForUserModel.password){
+    const hashedPassword = await bcrypt.hash(updatedDocForUserModel.password, envVars.SALT_COUNT)
+    updatedDocForUserModel.password = hashedPassword
+  }
+
+  await User.findByIdAndUpdate(userId, updatedDocForUserModel, {new:true, runValidators: true})
+
+  const updatedInfo = await Driver.findOneAndUpdate({ userId }, updatedDocForDriverModel, {new: true, runValidators: true})
+
+  return updatedInfo
 }
 
 
@@ -243,6 +263,7 @@ export const DriverServices = {
   getSingleDriver,
   setAvailability,
   viewMyEarning,
-  acceptRide
+  acceptRide,
+  updateDriverInfo
 
 };
