@@ -7,6 +7,7 @@ import { Ride } from "./ride.model";
 import { Payment } from "../payment/payment.model";
 import { PaymentStatus } from "../payment/payment.interface";
 import { IApprovalStatus } from "../driver/driver.interface";
+import { User } from "../user/user.model";
 
 
 
@@ -83,34 +84,34 @@ const updateRideStatus = async (rideId: string, status: string, driverId: string
 };
 
 const rideMe = async (id: string, query: Record<string, string>) => {
-  const size = Number(query.size) 
+  const size = Number(query.size)
   const page = Number(query.page)
-  
+
 
   const searchTerm = query.searchTerm || ""
   const sortByDate = query.sortByDate || ""
   const rideStatus = query.rideStatus || ""
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const baseQuery:  Record<string, any> = {user: id}
+  const baseQuery: Record<string, any> = { user: id }
 
-  if(rideStatus){
+  if (rideStatus) {
     baseQuery.ride_status = rideStatus
   }
 
-  if(searchTerm){
+  if (searchTerm) {
     baseQuery.$or = [
       { destination_address: { $regex: searchTerm, $options: "i" } },
       { pickup_address: { $regex: searchTerm, $options: "i" } }
     ]
   }
 
-  
+
 
   const allRides = await Ride.find(baseQuery)
     .skip(size * (page - 1))
     .limit(size)
-    .sort({ createdAt: sortByDate === "asc"? 1 : -1})
+    .sort({ createdAt: sortByDate === "asc" ? 1 : -1 })
     .populate({ path: "user", select: "name email phone" })
     .populate({
       path: "driver",
@@ -121,15 +122,15 @@ const rideMe = async (id: string, query: Record<string, string>) => {
       },
     })
     .populate("payment")
-    
 
- 
 
-  const totalDocument = await Ride.find({user:id}).countDocuments()
+
+
+  const totalDocument = await Ride.find({ user: id }).countDocuments()
 
 
   return {
-    allRides: allRides, 
+    allRides: allRides,
     meta: {
       numberOfTotalRides: totalDocument
     }
@@ -231,8 +232,73 @@ const getRequestedRides = async (userId: string) => {
 }
 
 
-const getAllRides = async() =>{
-  const allRides = await Ride.find().populate("driver")
+
+// "driver", "approval_status online_status availability"
+
+const getAllRides = async (query: Record<string, string>) => {
+  const searchTerm = query.searchTerm || ""
+  const ride_status = query.ride_status || ""
+  const date = query.date
+
+
+
+  
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const baseQuery: Record<string, any> = {}
+
+  if (ride_status){
+    baseQuery.ride_status = ride_status
+  }
+
+  if(date){
+    const start = new Date(date);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    baseQuery.createdAt = {
+      $gte: start,
+      $lte: end,
+    };
+  }
+
+  if (searchTerm) {
+
+    const userIds = await User.find({
+      $or:
+        [
+          {
+            name: { $regex: searchTerm, $options: "i" }
+          },
+          {
+            email: { $regex: searchTerm, $options: "i" }
+          }]
+    }).select("_id")
+
+
+    const driverIds = await Driver.find({
+      userId: { $in: userIds }
+    }).select("_id")
+
+    baseQuery.$or = [
+      { user: { $in: userIds } },
+      {
+        driver: { $in: driverIds }
+      }
+    ]
+
+  }
+  const allRides = await Ride.find(baseQuery)
+    .populate("user", "name email phone")
+    .populate({
+      path: "driver",
+      select: "userId approval_status online_status availability",
+      populate: {
+        path: "userId",
+        select: "name email phone"
+      }
+    })
+    .populate("payment", "paymentStatus transitionId")
 
   return allRides
 }

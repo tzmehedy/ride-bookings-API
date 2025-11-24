@@ -104,7 +104,10 @@ const getRequestedRides = catchAsync(async(req:Request, res:Response, next: Next
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getAllRides = catchAsync(async(req:Request, res:Response, next: NextFunction)=>{
 
-  const allRides = await rideServices.getAllRides()
+  const query = req.query                         
+
+  const allRides = await rideServices.getAllRides(query as Record<string, string>)
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatusCode.OK,
