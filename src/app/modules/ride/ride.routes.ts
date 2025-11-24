@@ -14,6 +14,8 @@ router.post("/cancel/:id", checkAuth(IRole.DRIVER, IRole.RIDER), rideControllers
 router.get("/me", checkAuth(IRole.RIDER), rideControllers.rideMe)
 router.get("/requested-rides", checkAuth(IRole.DRIVER), rideControllers.getRequestedRides)
 
+router.get("/all-rides", checkAuth(IRole.ADMIN), rideControllers.getAllRides)
+
 
 
 export const rideRoutes = router

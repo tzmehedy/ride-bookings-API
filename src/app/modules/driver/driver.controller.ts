@@ -146,22 +146,25 @@ const updateDriverInfo = catchAsync(
     const userId = decodedToken.userId
 
     // eslint-disable-next-line prefer-const
-    let { user_info: userUpdatedDoc, vehicle_info: driverUpdatedDoc} = req.body
+    let { user_info: userUpdatedDoc, vehicle_info} = req.body
+
+    
 
     const { password, ...rest } = userUpdatedDoc
 
     if (password === "") {
       userUpdatedDoc = rest
     }
-
-    // console.log(userUpdatedDoc, driverUpdatedDoc)
+    const driverUpdatedDoc = {
+      vehicle_info
+    }
 
     const updatedDriverInfo = await DriverServices.updateDriverInfo(userId, userUpdatedDoc, driverUpdatedDoc)
 
     sendResponse(res, {
       statusCode: httpStatusCode.OK,
       success: true,
-      message: "The Driver is approve for driving.",
+      message: "Your Profile info is updated",
       data: updatedDriverInfo
     })
   }

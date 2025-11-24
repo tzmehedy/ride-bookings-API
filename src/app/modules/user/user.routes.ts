@@ -12,7 +12,7 @@ router.post("/register", validationRequest(createZodSchema), userControllers.cre
 
 router.get("/all-users", checkAuth(IRole.ADMIN), userControllers.getAllUser)
 
-router.patch("/block/:id", checkAuth(IRole.ADMIN), userControllers.blockedUser)
+router.post("/block/:id", checkAuth(IRole.ADMIN), userControllers.blockedUnblockedUser)
 
 router.get("/me", checkAuth(IRole.ADMIN, IRole.DRIVER, IRole.RIDER), userControllers.getMe)
 

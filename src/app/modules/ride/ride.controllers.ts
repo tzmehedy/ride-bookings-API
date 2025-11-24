@@ -100,10 +100,25 @@ const getRequestedRides = catchAsync(async(req:Request, res:Response, next: Next
 })
 
 
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getAllRides = catchAsync(async(req:Request, res:Response, next: NextFunction)=>{
+
+  const allRides = await rideServices.getAllRides()
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatusCode.OK,
+    message: "All Rides Retrieve Successfully",
+    data: allRides
+  })
+})
+
+
 export const rideControllers = {
   requestRide,
   updateRideStatus,
   rideMe,
   cancelRide,
-  getRequestedRides
+  getRequestedRides,
+  getAllRides
 };

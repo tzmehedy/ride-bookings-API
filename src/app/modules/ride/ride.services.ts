@@ -105,6 +105,8 @@ const rideMe = async (id: string, query: Record<string, string>) => {
     ]
   }
 
+  
+
   const allRides = await Ride.find(baseQuery)
     .skip(size * (page - 1))
     .limit(size)
@@ -229,11 +231,19 @@ const getRequestedRides = async (userId: string) => {
 }
 
 
+const getAllRides = async() =>{
+  const allRides = await Ride.find().populate("driver")
+
+  return allRides
+}
+
+
 
 export const rideServices = {
   requestRide,
   updateRideStatus,
   rideMe,
   cancelRide,
-  getRequestedRides
+  getRequestedRides,
+  getAllRides
 };

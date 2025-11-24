@@ -25,7 +25,9 @@ const createUser = catchAsync(
 const getAllUser = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
-    const users = await userServices.getAllUser();
+    const query = req.query
+
+    const users = await userServices.getAllUser(query as Record<string, string>);
 
     sendResponse(res, {
       statusCode: httpStatusCode.OK,
@@ -37,10 +39,11 @@ const getAllUser = catchAsync(
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const blockedUser = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
+const blockedUnblockedUser = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
   const id = req.params.id 
+  const {blockStatus} = req.body
 
-  const blockedUserInfo = await userServices.blockedUser(id)
+  const blockedUserInfo = await userServices.blockedUnblockedUser(id, blockStatus )
 
   sendResponse(res, {
     statusCode: httpStatusCode.OK,
@@ -98,7 +101,7 @@ const updateUser = catchAsync(async(req:Request, res:Response, next:NextFunction
 export const userControllers = {
   createUser,
   getAllUser,
-  blockedUser,
+  blockedUnblockedUser,
   getMe,
   updateUser
 };
