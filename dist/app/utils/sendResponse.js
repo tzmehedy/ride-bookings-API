@@ -15,6 +15,7 @@ const sendResponse = (res, data) => __awaiter(void 0, void 0, void 0, function* 
         success: data.success,
         message: data.message,
         data: data.data,
+        statusCode: data.statusCode
     });
 });
 exports.sendResponse = sendResponse;

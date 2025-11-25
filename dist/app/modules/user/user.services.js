@@ -37,24 +37,72 @@ const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     }
     const hashedPassword = yield bcryptjs_1.default.hash(password, env_1.envVars.SALT_COUNT);
     payload.password = hashedPassword;
-    const user = yield user_model_1.User.create(payload);
+    const userPayload = Object.assign(Object.assign({}, payload), { auths: [
+            {
+                providerId: payload.email,
+                providerName: "Credentials",
+            },
+        ] });
+    const user = yield user_model_1.User.create(userPayload);
     return user;
 });
-const getAllUser = () => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield user_model_1.User.find();
+const getAllUser = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const searchTerm = query.searchTerm || "";
+    const blocked_status = query.blocked_status || "";
+    const role = query.role || "";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const baseQuery = { role: { $ne: "ADMIN" } };
+    if (blocked_status) {
+        baseQuery.isBlocked = blocked_status;
+    }
+    if (role) {
+        baseQuery.role = role;
+    }
+    if (searchTerm) {
+        baseQuery.$or = [
+            {
+                name: { $regex: searchTerm, $options: "i" }
+            },
+            {
+                email: { $regex: searchTerm, $options: "i" }
+            },
+            {
+                phone: { $regex: searchTerm, $options: "i" }
+            }
+        ];
+    }
+    const users = yield user_model_1.User.find(baseQuery);
     return users;
 });
-const blockedUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
+const blockedUnblockedUser = (id, blockStatus) => __awaiter(void 0, void 0, void 0, function* () {
     const updatedUsersDoc = {
-        isBlocked: true
+        isBlocked: blockStatus
     };
     const updatedUserInfo = yield user_model_1.User.findByIdAndUpdate(id, updatedUsersDoc, { new: true });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _a = updatedUserInfo === null || updatedUserInfo === void 0 ? void 0 : updatedUserInfo.toObject(), { password: pass } = _a, rest = __rest(_a, ["password"]);
     return rest;
 });
+const getMe = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const userInfo = yield user_model_1.User.findById(id);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _a = userInfo === null || userInfo === void 0 ? void 0 : userInfo.toObject(), { password: pass } = _a, rest = __rest(_a, ["password"]);
+    return rest;
+});
+const updateUser = (id, updatedDoc) => __awaiter(void 0, void 0, void 0, function* () {
+    if (updatedDoc.password) {
+        const hashedPassword = yield bcryptjs_1.default.hash(updatedDoc.password, env_1.envVars.SALT_COUNT);
+        updatedDoc.password = hashedPassword;
+    }
+    const updatedUserInfo = yield user_model_1.User.findByIdAndUpdate(id, updatedDoc, {
+        new: true
+    });
+    return updatedUserInfo;
+});
 exports.userServices = {
     createUser,
     getAllUser,
-    blockedUser,
+    blockedUnblockedUser,
+    getMe,
+    updateUser
 };

@@ -18,6 +18,9 @@ const auth_services_1 = require("./auth.services");
 const sendResponse_1 = require("../../utils/sendResponse");
 const setCookies_1 = require("../../utils/setCookies");
 const catchAsync_1 = require("../../utils/catchAsync");
+const appError_1 = __importDefault(require("../../errorhelpers/appError"));
+const userTokens_1 = require("../../utils/userTokens");
+const env_1 = require("../../config/env");
 const credentialsLogin = (0, catchAsync_1.catchAsync)(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -49,7 +52,22 @@ const logOut = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0
         data: null,
     });
 }));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const googleCallback = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let redirectTo = req.query.state ? req.query.state : "";
+    if (redirectTo.startsWith("/")) {
+        redirectTo = redirectTo.slice(1);
+    }
+    const user = req.user;
+    if (!user) {
+        throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, "User Not Found");
+    }
+    const tokens = yield (0, userTokens_1.createUserTokens)(user);
+    (0, setCookies_1.setCookies)(res, tokens);
+    res.redirect(`${env_1.envVars.FRONTEND_URL}/${redirectTo}`);
+}));
 exports.AuthControllers = {
     credentialsLogin,
     logOut,
+    googleCallback,
 };

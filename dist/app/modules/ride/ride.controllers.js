@@ -17,53 +17,80 @@ const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const catchAsync_1 = require("../../utils/catchAsync");
 const ride_services_1 = require("./ride.services");
 const sendResponse_1 = require("../../utils/sendResponse");
-const appError_1 = __importDefault(require("../../errorhelpers/appError"));
+const requestRide = (0, catchAsync_1.catchAsync)(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const requestRide = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.user.userId;
-    const rideRequestInfo = yield ride_services_1.rideServices.requestRide(req.body, userId);
+(req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const rideRequestInfo = yield ride_services_1.rideServices.requestRide(req.body, decodedToken.userId);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
         message: "The ride request successfully requested.",
-        data: rideRequestInfo
+        data: rideRequestInfo,
     });
 }));
+const updateRideStatus = (0, catchAsync_1.catchAsync)(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const updateRideStatus = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    const status = req.query.status;
-    const updatedInfo = yield ride_services_1.rideServices.updateRideStatus(id, status);
+(req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const rideId = req.params.id;
+    const status = req.body.status;
+    const decodedToken = req.user;
+    const driverId = decodedToken.userId;
+    const updatedInfo = yield ride_services_1.rideServices.updateRideStatus(rideId, status, driverId);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
         message: "The ride status update successfully",
-        data: updatedInfo
+        data: updatedInfo,
     });
 }));
+const rideMe = (0, catchAsync_1.catchAsync)(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const rideMe = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    if (req.user.userId !== id) {
-        throw new appError_1.default(http_status_codes_1.default.FORBIDDEN, "Forbidden Access.");
-    }
-    const allRideMe = yield ride_services_1.rideServices.rideMe(id);
+(req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const id = decodedToken.userId;
+    const query = req.query;
+    const allRideMe = yield ride_services_1.rideServices.rideMe(id, query);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
         message: "All ride retrieve successfully.",
-        data: allRideMe
+        data: allRideMe,
     });
 }));
+const cancelRide = (0, catchAsync_1.catchAsync)(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const cancelRide = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+(req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const rideId = req.params.id;
     const updatedRideInfo = yield ride_services_1.rideServices.cancelRide(rideId);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
         message: "The ride successfully canceled.",
-        data: updatedRideInfo
+        data: updatedRideInfo,
+    });
+}));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getRequestedRides = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const userId = decodedToken.userId;
+    const requestedRides = yield ride_services_1.rideServices.getRequestedRides(userId);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.OK,
+        message: "The ride requested retrieve successfully.",
+        data: requestedRides
+    });
+}));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getAllRides = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const query = req.query;
+    const allRides = yield ride_services_1.rideServices.getAllRides(query);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.OK,
+        message: "All Rides Retrieve Successfully",
+        data: allRides
     });
 }));
 exports.rideControllers = {
@@ -71,4 +98,6 @@ exports.rideControllers = {
     updateRideStatus,
     rideMe,
     cancelRide,
+    getRequestedRides,
+    getAllRides
 };

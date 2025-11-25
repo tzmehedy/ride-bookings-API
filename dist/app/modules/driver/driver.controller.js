@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -22,7 +33,8 @@ const appError_1 = __importDefault(require("../../errorhelpers/appError"));
 const mongoose_1 = require("mongoose");
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const createDriver = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.params.id;
+    const decodedToken = req.user;
+    const userId = decodedToken.userId;
     const { vehicle_info } = req.body;
     const accessToken = req.cookies.accessToken;
     const verifiedToken = (yield (0, jwt_1.verifyToken)(accessToken));
@@ -42,20 +54,33 @@ const createDriver = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(
     });
 }));
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getAllDrivers = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const allDrivers = yield driver_services_1.DriverServices.getAllDrivers();
+const getRequestedDrivers = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const requestedDrivers = yield driver_services_1.DriverServices.getRequestedDrivers();
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
-        message: "All driver retrieve successfully.",
-        data: allDrivers
+        message: "All requested driver retrieve successfully.",
+        data: requestedDrivers
+    });
+}));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getSingleDriver = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const userId = decodedToken.userId;
+    const driverInfo = yield driver_services_1.DriverServices.getSingleDriver(userId);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "Single driver info get successfully",
+        data: driverInfo
     });
 }));
 const driverApproval = (0, catchAsync_1.catchAsync)(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
-    const updatedDriverInfo = yield driver_services_1.DriverServices.driverApproval(userId);
+    const status = req.query.status;
+    const updatedDriverInfo = yield driver_services_1.DriverServices.driverApproval(userId, status);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
@@ -65,9 +90,10 @@ const driverApproval = (0, catchAsync_1.catchAsync)(
 }));
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const setAvailability = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const driverId = req.params.driverId;
-    const availability = req.query.availability;
-    const updatedDriverInfo = yield driver_services_1.DriverServices.setAvailability(driverId, availability);
+    const decodedToken = req.user;
+    const driverId = decodedToken.userId;
+    const status = req.body.online_status;
+    const updatedDriverInfo = yield driver_services_1.DriverServices.setAvailability(driverId, status);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
@@ -87,10 +113,49 @@ const viewMyEarning = (0, catchAsync_1.catchAsync)(
         data: driverInfo,
     });
 }));
+const acceptRide = (0, catchAsync_1.catchAsync)(
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+(req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const driverId = decodedToken.userId;
+    const rideId = req.params.id;
+    const acceptedRideInfo = yield driver_services_1.DriverServices.acceptRide(rideId, driverId);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.OK,
+        message: "The ride is successfully accepted.",
+        data: acceptedRideInfo,
+    });
+}));
+const updateDriverInfo = (0, catchAsync_1.catchAsync)(
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+(req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const userId = decodedToken.userId;
+    // eslint-disable-next-line prefer-const
+    let { user_info: userUpdatedDoc, vehicle_info } = req.body;
+    const { password } = userUpdatedDoc, rest = __rest(userUpdatedDoc, ["password"]);
+    if (password === "") {
+        userUpdatedDoc = rest;
+    }
+    const driverUpdatedDoc = {
+        vehicle_info
+    };
+    const updatedDriverInfo = yield driver_services_1.DriverServices.updateDriverInfo(userId, userUpdatedDoc, driverUpdatedDoc);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "Your Profile info is updated",
+        data: updatedDriverInfo
+    });
+}));
 exports.DriverControllers = {
     createDriver,
     driverApproval,
-    getAllDrivers,
+    getRequestedDrivers,
     setAvailability,
     viewMyEarning,
+    getSingleDriver,
+    acceptRide,
+    updateDriverInfo
 };

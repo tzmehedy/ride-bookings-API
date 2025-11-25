@@ -32,9 +32,12 @@ const checkAuth = (...AuthRole) => (req, res, next) => __awaiter(void 0, void 0,
         if (!isUserExist) {
             throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "The user does not exist.");
         }
-        if (isUserExist.isBlocked === true) {
-            throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "The user is blocked");
-        }
+        // if(isUserExist.isBlocked === true){
+        //     throw new AppError(
+        //       httpStatusCode.BAD_REQUEST,
+        //       "The user is blocked"
+        //     );
+        // }
         if (!AuthRole.includes(isUserExist.role)) {
             throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "You are not permitted for this route.");
         }

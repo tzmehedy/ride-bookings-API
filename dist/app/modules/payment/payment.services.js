@@ -25,6 +25,9 @@ const initPayment = (rideId) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isPaymentExist) {
         throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Payment Does not exist.");
     }
+    if (isPaymentExist.paymentStatus === payment_interface_1.PaymentStatus.PAID) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Your already pay for this ride");
+    }
     const rideInfo = yield ride_model_1.Ride.findById(rideId)
         .populate("user", "name email phone")
         .populate("driver", "approval_status online_status vehicle_info")
@@ -40,14 +43,22 @@ const initPayment = (rideId) => __awaiter(void 0, void 0, void 0, function* () {
     return sslPaymentInfo.GatewayPageURL;
 });
 const successPayment = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    yield payment_model_1.Payment.findOneAndUpdate({
+    const updatedInfo = yield payment_model_1.Payment.findOneAndUpdate({
         transitionId: query.transitionId,
     }, {
         paymentStatus: payment_interface_1.PaymentStatus.PAID
-    });
+    }, {
+        new: true
+    }).populate("ride");
+    console.log(updatedInfo);
     return {
         success: true,
-        message: "Payment successfully completed."
+        message: "Payment successfully completed.",
+        data: {
+            transitionId: updatedInfo === null || updatedInfo === void 0 ? void 0 : updatedInfo.transitionId,
+            paymentStatus: updatedInfo === null || updatedInfo === void 0 ? void 0 : updatedInfo.paymentStatus,
+            amount: updatedInfo === null || updatedInfo === void 0 ? void 0 : updatedInfo.amount
+        }
     };
 });
 const failPayment = (query) => __awaiter(void 0, void 0, void 0, function* () {

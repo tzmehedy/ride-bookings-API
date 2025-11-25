@@ -17,7 +17,7 @@ export const seedAdmin = async()=>{
 
         const hashedPassword = await bcrypt.hash(envVars.ADMIN_PASS, envVars.SALT_COUNT)
 
-        const adminPayload: IUser = {
+        const adminPayload: Partial<IUser> = {
           name: envVars.ADMIN_NAME,
           email: envVars.ADMIN_Email,
           password: hashedPassword,

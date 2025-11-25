@@ -29,12 +29,12 @@ export const checkAuth = (...AuthRole: string[]) => async(req:Request, res:Respo
             throw new AppError(httpStatusCode.BAD_REQUEST, "The user does not exist.")
         }
 
-        if(isUserExist.isBlocked === true){
-            throw new AppError(
-              httpStatusCode.BAD_REQUEST,
-              "The user is blocked"
-            );
-        }
+        // if(isUserExist.isBlocked === true){
+        //     throw new AppError(
+        //       httpStatusCode.BAD_REQUEST,
+        //       "The user is blocked"
+        //     );
+        // }
 
         if(!AuthRole.includes(isUserExist.role)){
             throw new AppError(

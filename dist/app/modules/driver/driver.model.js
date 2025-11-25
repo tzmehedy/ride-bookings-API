@@ -28,5 +28,6 @@ const driverSchema = new mongoose_1.Schema({
     availability: { type: Boolean, default: true }
 }, {
     timestamps: true,
+    versionKey: false
 });
 exports.Driver = (0, mongoose_1.model)("Driver", driverSchema);

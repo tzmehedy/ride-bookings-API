@@ -13,31 +13,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.rideServices = void 0;
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const appError_1 = __importDefault(require("../../errorhelpers/appError"));
 const driver_model_1 = require("../driver/driver.model");
 const ride_interface_1 = require("./ride.interface");
 const ride_model_1 = require("./ride.model");
 const payment_model_1 = require("../payment/payment.model");
-const sslCommerz_services_1 = require("../sslcommerz/sslCommerz.services");
 const payment_interface_1 = require("../payment/payment.interface");
-const generateTransitionId = () => {
-    return `transId_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-};
+const driver_interface_1 = require("../driver/driver.interface");
+const user_model_1 = require("../user/user.model");
 const requestRide = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
     const session = yield ride_model_1.Ride.startSession();
     session.startTransaction();
     try {
-        const allAvailableDriver = yield driver_model_1.Driver.find({
-            approval_status: "Accept",
-            online_status: "Active",
-            availability: true,
-        });
-        const availableDriver = allAvailableDriver[0];
-        if (!availableDriver) {
-            throw new appError_1.default(http_status_codes_1.default.NOT_FOUND, "Our All driver is busy now. Please try again.");
-        }
         const isUserExist = yield ride_model_1.Ride.find({ user: userId });
         if (isUserExist) {
             isUserExist.forEach((r) => {
@@ -47,41 +35,12 @@ const requestRide = (payload, userId) => __awaiter(void 0, void 0, void 0, funct
                 }
             });
         }
-        const transitionId = generateTransitionId();
         const rideRequestInfo = yield ride_model_1.Ride.create([
-            Object.assign(Object.assign({}, payload), { user: userId, driver: availableDriver._id, ride_status: ride_interface_1.RideStatus.Accepted }),
+            Object.assign(Object.assign({}, payload), { user: userId, ride_status: ride_interface_1.RideStatus.Requested }),
         ], { session });
-        yield driver_model_1.Driver.findByIdAndUpdate(availableDriver._id, {
-            rideId: [...availableDriver.rideId, rideRequestInfo[0]._id],
-            availability: false,
-        }, { session });
-        const paymentInfo = yield payment_model_1.Payment.create([
-            {
-                ride: rideRequestInfo[0]._id,
-                transitionId,
-                amount: rideRequestInfo[0].price,
-            },
-        ], { session });
-        const updatedRideInfo = yield ride_model_1.Ride.findByIdAndUpdate(rideRequestInfo[0]._id, {
-            payment: paymentInfo[0]._id,
-        }, { new: true, runValidators: true, session })
-            .populate("user", "name email phone")
-            .populate("driver", "approval_status online_status vehicle_info")
-            .populate("payment");
-        const sslCommerzPayload = {
-            amount: (updatedRideInfo === null || updatedRideInfo === void 0 ? void 0 : updatedRideInfo.payment).amount,
-            transitionID: (updatedRideInfo === null || updatedRideInfo === void 0 ? void 0 : updatedRideInfo.payment).transitionId,
-            name: (updatedRideInfo === null || updatedRideInfo === void 0 ? void 0 : updatedRideInfo.user).name,
-            email: (updatedRideInfo === null || updatedRideInfo === void 0 ? void 0 : updatedRideInfo.user).email,
-            phone: (updatedRideInfo === null || updatedRideInfo === void 0 ? void 0 : updatedRideInfo.user).phone,
-        };
-        const sslPaymentInfo = yield sslCommerz_services_1.sslCommerzServices.initPayment(sslCommerzPayload);
         yield session.commitTransaction();
         session.endSession();
-        return {
-            paymentUrl: sslPaymentInfo.GatewayPageURL,
-            rideInfo: updatedRideInfo,
-        };
+        return rideRequestInfo;
     }
     catch (error) {
         yield session.abortTransaction();
@@ -89,22 +48,59 @@ const requestRide = (payload, userId) => __awaiter(void 0, void 0, void 0, funct
         throw error;
     }
 });
-const updateRideStatus = (id, status) => __awaiter(void 0, void 0, void 0, function* () {
-    const updatedInfo = yield ride_model_1.Ride.findByIdAndUpdate(id, { ride_status: status }, { new: true });
+const updateRideStatus = (rideId, status, driverId) => __awaiter(void 0, void 0, void 0, function* () {
+    if (status === ride_interface_1.RideStatus.Completed) {
+        yield driver_model_1.Driver.findOneAndUpdate({ userId: driverId }, {
+            availability: true
+        });
+        const rideInfo = yield ride_model_1.Ride.findById(rideId);
+        if ((rideInfo === null || rideInfo === void 0 ? void 0 : rideInfo.paymentMethod) === "Cash") {
+            yield payment_model_1.Payment.findOneAndUpdate({ ride: rideId }, {
+                paymentStatus: payment_interface_1.PaymentStatus.PAID
+            });
+        }
+    }
+    const updatedInfo = yield ride_model_1.Ride.findByIdAndUpdate(rideId, { ride_status: status }, { new: true });
     return updatedInfo;
 });
-const rideMe = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const allRides = yield ride_model_1.Ride.find({ userId: id })
-        .populate({ path: "userId", select: "name email phone" })
+const rideMe = (id, query) => __awaiter(void 0, void 0, void 0, function* () {
+    const size = Number(query.size);
+    const page = Number(query.page);
+    const searchTerm = query.searchTerm || "";
+    const sortByDate = query.sortByDate || "";
+    const rideStatus = query.rideStatus || "";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const baseQuery = { user: id };
+    if (rideStatus) {
+        baseQuery.ride_status = rideStatus;
+    }
+    if (searchTerm) {
+        baseQuery.$or = [
+            { destination_address: { $regex: searchTerm, $options: "i" } },
+            { pickup_address: { $regex: searchTerm, $options: "i" } }
+        ];
+    }
+    const allRides = yield ride_model_1.Ride.find(baseQuery)
+        .skip(size * (page - 1))
+        .limit(size)
+        .sort({ createdAt: sortByDate === "asc" ? 1 : -1 })
+        .populate({ path: "user", select: "name email phone" })
         .populate({
-        path: "driverId",
-        select: "userId vehicle_Info",
+        path: "driver",
+        select: "vehicle_info",
         populate: {
             path: "userId",
             select: "name email phone",
         },
-    });
-    return allRides;
+    })
+        .populate("payment");
+    const totalDocument = yield ride_model_1.Ride.find({ user: id }).countDocuments();
+    return {
+        allRides: allRides,
+        meta: {
+            numberOfTotalRides: totalDocument
+        }
+    };
 });
 const cancelRide = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const session = yield ride_model_1.Ride.startSession();
@@ -146,9 +142,72 @@ const cancelRide = (id) => __awaiter(void 0, void 0, void 0, function* () {
         throw error;
     }
 });
+const getRequestedRides = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const isDriverApproved = yield driver_model_1.Driver.findOne({ userId });
+    if ((isDriverApproved === null || isDriverApproved === void 0 ? void 0 : isDriverApproved.approval_status) !== driver_interface_1.IApprovalStatus.Accept) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "You are not approved for driver.");
+    }
+    const requestedRides = yield ride_model_1.Ride.find({ ride_status: "Requested" }).populate("user", "name email phone");
+    return requestedRides;
+});
+// "driver", "approval_status online_status availability"
+const getAllRides = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const searchTerm = query.searchTerm || "";
+    const ride_status = query.ride_status || "";
+    const date = query.date;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const baseQuery = {};
+    if (ride_status) {
+        baseQuery.ride_status = ride_status;
+    }
+    if (date) {
+        const start = new Date(date);
+        const end = new Date(date);
+        end.setHours(23, 59, 59, 999);
+        baseQuery.createdAt = {
+            $gte: start,
+            $lte: end,
+        };
+    }
+    if (searchTerm) {
+        const userIds = yield user_model_1.User.find({
+            $or: [
+                {
+                    name: { $regex: searchTerm, $options: "i" }
+                },
+                {
+                    email: { $regex: searchTerm, $options: "i" }
+                }
+            ]
+        }).select("_id");
+        const driverIds = yield driver_model_1.Driver.find({
+            userId: { $in: userIds }
+        }).select("_id");
+        baseQuery.$or = [
+            { user: { $in: userIds } },
+            {
+                driver: { $in: driverIds }
+            }
+        ];
+    }
+    const allRides = yield ride_model_1.Ride.find(baseQuery)
+        .populate("user", "name email phone")
+        .populate({
+        path: "driver",
+        select: "userId approval_status online_status availability",
+        populate: {
+            path: "userId",
+            select: "name email phone"
+        }
+    })
+        .populate("payment", "paymentStatus transitionId");
+    return allRides;
+});
 exports.rideServices = {
     requestRide,
     updateRideStatus,
     rideMe,
     cancelRide,
+    getRequestedRides,
+    getAllRides
 };

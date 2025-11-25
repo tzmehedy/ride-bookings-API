@@ -44,7 +44,7 @@ const successPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void
     const query = req.query;
     const result = yield payment_services_1.paymentServices.successPayment(query);
     if (result.success) {
-        res.redirect(env_1.envVars.SSL.SSL_COMMERZ_FRONTEND_SUCCESS_URL);
+        res.redirect(`${env_1.envVars.SSL.SSL_COMMERZ_FRONTEND_SUCCESS_URL}?transitionId=${result.data.transitionId}&paymentStatus=${result.data.paymentStatus}&price=${result.data.amount}`);
     }
 }));
 const failPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

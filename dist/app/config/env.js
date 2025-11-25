@@ -20,6 +20,11 @@ const loadEnvVars = () => {
         "ADMIN_PASS",
         "ADMIN_PHONE",
         "ADMIN_NAME",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "GOOGLE_CALLBACK_URL",
+        "EXPRESS_SESSION_SECRET",
+        "FRONTEND_URL",
         "SSL_COMMERZ_ID",
         "SSL_COMMERZ_PASS",
         "SSL_COMMERZ_PAYMENT_API",
@@ -30,7 +35,11 @@ const loadEnvVars = () => {
         "SSL_COMMERZ_FRONTEND_FAILED_URL",
         "SSL_COMMERZ_BACKEND_SUCCESS_URL",
         "SSL_COMMERZ_BACKEND_CANCEL_URL",
-        "SSL_COMMERZ_BACKEND_FAILED_URL"
+        "SSL_COMMERZ_BACKEND_FAILED_URL",
+        "CLOUDINARY_NAME",
+        "CLOUDINARY_API_KEY",
+        "CLOUDINARY_API_SECRET",
+        "GOOGLE_API_KEY",
     ];
     requiredEnvVar.forEach(key => {
         if (!process.env[key]) {
@@ -50,20 +59,38 @@ const loadEnvVars = () => {
         ADMIN_PASS: process.env.ADMIN_PASS,
         ADMIN_PHONE: process.env.ADMIN_PHONE,
         ADMIN_NAME: process.env.ADMIN_NAME,
+        GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+        GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL,
+        EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET,
+        FRONTEND_URL: process.env.FRONTEND_URL,
         SSL: {
             SSL_COMMERZ_ID: process.env.SSL_COMMERZ_ID,
             SSL_COMMERZ_PASS: process.env.SSL_COMMERZ_PASS,
             SSL_COMMERZ_PAYMENT_API: process.env.SSL_COMMERZ_PAYMENT_API,
             SSL_COMMERZ_VALIDATION_API: process.env
                 .SSL_COMMERZ_VALIDATION_API,
-            SSL_COMMERZ_VALIDATE_URL: process.env.SSL_COMMERZ_VALIDATE_URL,
-            SSL_COMMERZ_FRONTEND_SUCCESS_URL: process.env.SSL_COMMERZ_FRONTEND_SUCCESS_URL,
-            SSL_COMMERZ_FRONTEND_CANCEL_URL: process.env.SSL_COMMERZ_FRONTEND_CANCEL_URL,
-            SSL_COMMERZ_FRONTEND_FAILED_URL: process.env.SSL_COMMERZ_FRONTEND_FAILED_URL,
-            SSL_COMMERZ_BACKEND_SUCCESS_URL: process.env.SSL_COMMERZ_BACKEND_SUCCESS_URL,
-            SSL_COMMERZ_BACKEND_CANCEL_URL: process.env.SSL_COMMERZ_BACKEND_CANCEL_URL,
-            SSL_COMMERZ_BACKEND_FAILED_URL: process.env.SSL_COMMERZ_BACKEND_FAILED_URL
+            SSL_COMMERZ_VALIDATE_URL: process.env
+                .SSL_COMMERZ_VALIDATE_URL,
+            SSL_COMMERZ_FRONTEND_SUCCESS_URL: process.env
+                .SSL_COMMERZ_FRONTEND_SUCCESS_URL,
+            SSL_COMMERZ_FRONTEND_CANCEL_URL: process.env
+                .SSL_COMMERZ_FRONTEND_CANCEL_URL,
+            SSL_COMMERZ_FRONTEND_FAILED_URL: process.env
+                .SSL_COMMERZ_FRONTEND_FAILED_URL,
+            SSL_COMMERZ_BACKEND_SUCCESS_URL: process.env
+                .SSL_COMMERZ_BACKEND_SUCCESS_URL,
+            SSL_COMMERZ_BACKEND_CANCEL_URL: process.env
+                .SSL_COMMERZ_BACKEND_CANCEL_URL,
+            SSL_COMMERZ_BACKEND_FAILED_URL: process.env
+                .SSL_COMMERZ_BACKEND_FAILED_URL,
         },
+        CLOUDINARY: {
+            CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
+            CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+            CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+        },
+        GOOGLE_API_KEY: process.env.GOOGLE_API_KEY
     };
 };
 exports.envVars = loadEnvVars();

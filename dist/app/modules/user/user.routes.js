@@ -10,5 +10,7 @@ const user_interface_1 = require("./user.interface");
 const router = (0, express_1.Router)();
 router.post("/register", (0, validationRequest_1.validationRequest)(user_validates_1.createZodSchema), user_controller_1.userControllers.createUser);
 router.get("/all-users", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.ADMIN), user_controller_1.userControllers.getAllUser);
-router.patch("/block/:id", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.ADMIN), user_controller_1.userControllers.blockedUser);
+router.post("/block/:id", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.ADMIN), user_controller_1.userControllers.blockedUnblockedUser);
+router.get("/me", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.ADMIN, user_interface_1.IRole.DRIVER, user_interface_1.IRole.RIDER), user_controller_1.userControllers.getMe);
+router.post("/update-user", (0, checkAuth_1.checkAuth)(user_interface_1.IRole.ADMIN, user_interface_1.IRole.DRIVER, user_interface_1.IRole.RIDER), user_controller_1.userControllers.updateUser);
 exports.userRoutes = router;

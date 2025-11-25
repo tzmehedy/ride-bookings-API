@@ -8,7 +8,7 @@ const zod_1 = __importDefault(require("zod"));
 exports.createZodSchema = zod_1.default.object({
     name: zod_1.default
         .string({ message: "Name must be string" })
-        .min(5, { message: "The name must be 5 character" })
+        .min(3, { message: "The name must be 5 character" })
         .max(30, { message: "The name length must be less than 30" }),
     email: zod_1.default.string().email({ error: "Please provide a valid email" }),
     password: zod_1.default
@@ -26,6 +26,7 @@ exports.createZodSchema = zod_1.default.object({
         message: "Phone number must be Bangladeshi format..., for example:- +8801700000000",
     })
         .optional(),
+    role: zod_1.default.string({ message: "role is required" }),
     picture: zod_1.default.string().optional(),
     isBlocked: zod_1.default.boolean().optional(),
 });
