@@ -6,6 +6,7 @@ import { StatsControllers } from "./stats.controller";
 const router = Router()
 
 router.get("/driver", checkAuth(IRole.DRIVER), StatsControllers.getDriverStats)
+router.get("/admin", checkAuth(IRole.ADMIN),StatsControllers.getAdminStats )
 
 
 export const statsRoutes = router

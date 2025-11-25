@@ -24,6 +24,25 @@ const getDriverStats = catchAsync(async(req:Request, res: Response, next: NextFu
 })
 
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getAdminStats = catchAsync(async(req:Request, res: Response, next: NextFunction)=>{
+    
+
+    const adminStats = await StatsServices.getAdminStats()
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatusCode.OK,
+        message: "The Admin Stats Get Successfully.",
+        data: adminStats
+    })
+
+
+
+})
+
+
 export const StatsControllers = {
-    getDriverStats
+    getDriverStats,
+    getAdminStats
 }

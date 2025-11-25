@@ -242,8 +242,6 @@ const getAllRides = async (query: Record<string, string>) => {
 
 
 
-  
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const baseQuery: Record<string, any> = {}
 
@@ -275,10 +273,12 @@ const getAllRides = async (query: Record<string, string>) => {
           }]
     }).select("_id")
 
-
+  
     const driverIds = await Driver.find({
       userId: { $in: userIds }
     }).select("_id")
+
+  
 
     baseQuery.$or = [
       { user: { $in: userIds } },
@@ -288,6 +288,8 @@ const getAllRides = async (query: Record<string, string>) => {
     ]
 
   }
+
+
   const allRides = await Ride.find(baseQuery)
     .populate("user", "name email phone")
     .populate({
